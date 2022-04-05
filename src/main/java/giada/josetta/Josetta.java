@@ -35,8 +35,8 @@ public class Josetta {
     if (constructors.size() > 1) {
       throw new RuntimeException("Class " + name + " has more than one constructor");
     }
+    builder.append("\n");
 
-//    builder.append("\n");
 //    classDeclaration.getMethods().forEach(declaration -> transpileMethod(builder, declaration));
     builder.append("}");
   }
@@ -44,7 +44,10 @@ public class Josetta {
   private static void transpileClassParameter(StringBuilder builder, String name, FieldDeclaration fieldDeclaration) {
     fieldDeclaration.getVariables().forEach(variable -> {
       builder.append("  ").append(variable.getNameAsString());
-      variable.getInitializer().ifPresent(expression -> ExpressionTranspiler.transpile(builder.append(" = "), name, expression));
+      variable.getInitializer().ifPresentOrElse(
+              expression -> ExpressionTranspiler.transpile(builder.append(" = "), name, expression),
+              () -> ClassParameterInitializationTranspiler.transpile(builder.append(" = "), name, variable)
+      );
       builder.append(";\n");
     });
   }
@@ -109,7 +112,6 @@ public class Josetta {
 //
 //    builder.append("  }\n");
 //  }
-
   private Josetta() {
   }
 }

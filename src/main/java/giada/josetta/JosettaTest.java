@@ -1,6 +1,5 @@
 package giada.josetta;
 
-import giada.josetta.Josetta;
 import java.io.File;
 
 public class JosettaTest {

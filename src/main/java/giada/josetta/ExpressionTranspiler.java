@@ -4,87 +4,62 @@ import com.github.javaparser.ast.expr.Expression;
 
 public class ExpressionTranspiler {
 
+  private static boolean done = false;
+
   public static void transpile(StringBuilder builder, String name, Expression expression) {
-    if (expression.isAnnotationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isArrayAccessExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isArrayCreationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isArrayInitializerExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isAssignExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isBinaryExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isBooleanLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isCastExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isCharLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isClassExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isConditionalExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isDoubleLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isEnclosedExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isFieldAccessExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isInstanceOfExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isIntegerLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isLambdaExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isLiteralStringValueExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isLongLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isMarkerAnnotationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isMethodCallExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isMethodReferenceExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isNameExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isNormalAnnotationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isNullLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isObjectCreationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isPatternExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isPolyExpression()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isSingleMemberAnnotationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isStandaloneExpression()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isStringLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isSuperExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isSwitchExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isTextBlockLiteralExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isThisExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isTypeExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isUnaryExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else if (expression.isVariableDeclarationExpr()) {
-      throw new RuntimeException("Class " + name + ": expression type not yet handled => " + expression);
-    } else {
-      throw new RuntimeException("Class " + name + ": unknown expression type and not yet handled => " + expression);
+    done = false;
+
+    expression.ifAnnotationExpr(exp -> throwException(name, expression));
+    expression.ifBooleanLiteralExpr(exp -> append(builder, expression));
+    expression.ifCharLiteralExpr(exp -> append(builder, expression));
+    expression.ifDoubleLiteralExpr(exp -> append(builder, expression.asDoubleLiteralExpr().asDouble()));
+    expression.ifIntegerLiteralExpr(exp -> append(builder, expression.asIntegerLiteralExpr().asNumber()));
+    expression.ifLongLiteralExpr(exp -> append(builder, expression.asLongLiteralExpr().asNumber()));
+    expression.ifNullLiteralExpr(exp -> append(builder, "null"));
+    expression.ifStringLiteralExpr(exp -> append(builder, expression));
+    expression.ifTextBlockLiteralExpr(exp -> throwException(name, expression));
+    expression.ifLiteralStringValueExpr(exp -> throwException(name, expression));
+    expression.ifLiteralExpr(exp -> throwException(name, expression));
+    expression.ifArrayAccessExpr(exp -> throwException(name, expression));
+    expression.ifArrayCreationExpr(exp -> throwException(name, expression));
+    expression.ifArrayInitializerExpr(exp -> throwException(name, expression));
+    expression.ifAssignExpr(exp -> throwException(name, expression));
+    expression.ifBinaryExpr(exp -> throwException(name, expression));
+    expression.ifCastExpr(exp -> transpile(builder, name, expression.asCastExpr().getExpression()));
+    expression.ifClassExpr(exp -> throwException(name, expression));
+    expression.ifConditionalExpr(exp -> throwException(name, expression));
+    expression.ifEnclosedExpr(exp -> throwException(name, expression));
+    expression.ifFieldAccessExpr(exp -> throwException(name, expression));
+    expression.ifInstanceOfExpr(exp -> throwException(name, expression));
+    expression.ifLambdaExpr(exp -> throwException(name, expression));
+    expression.ifMarkerAnnotationExpr(exp -> throwException(name, expression));
+    expression.ifMethodCallExpr(exp -> throwException(name, expression));
+    expression.ifMethodReferenceExpr(exp -> throwException(name, expression));
+    expression.ifNameExpr(exp -> throwException(name, expression));
+    expression.ifNormalAnnotationExpr(exp -> throwException(name, expression));
+    expression.ifObjectCreationExpr(exp -> append(builder, expression));
+    expression.ifPatternExpr(exp -> throwException(name, expression));
+    expression.ifSingleMemberAnnotationExpr(exp -> throwException(name, expression));
+    expression.ifSuperExpr(exp -> throwException(name, expression));
+    expression.ifSwitchExpr(exp -> throwException(name, expression));
+    expression.ifThisExpr(exp -> throwException(name, expression));
+    expression.ifTypeExpr(exp -> throwException(name, expression));
+    expression.ifUnaryExpr(exp -> throwException(name, expression));
+    expression.ifVariableDeclarationExpr(exp -> throwException(name, expression));
+
+    throwException(name, expression);
+  }
+
+  private static void append(StringBuilder builder, Object object) {
+    if (!done) {
+      builder.append(object);
+      done = true;
+    }
+  }
+
+  private static void throwException(String name, Expression expression) {
+    if (!done) {
+      throw new RuntimeException("Class " + name + ": expression type not yet handled => [" + expression.getClass().getSimpleName() + "]" + expression);
     }
   }
 
