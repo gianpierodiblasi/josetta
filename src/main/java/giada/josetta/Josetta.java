@@ -42,9 +42,7 @@ public class Josetta {
     append(writer, "\n");
 
     List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
-    if (constructors.isEmpty()) {
-      append(writer, "  constructor() {}\n");
-    } else if (constructors.size() > 1) {
+    if (constructors.size() > 1) {
       throw new RuntimeException("Class " + className + " has more than one constructor");
     } else {
       constructors.forEach(constructorDeclaration -> transpileConstructor(writer, constructorDeclaration));
@@ -68,13 +66,15 @@ public class Josetta {
   }
 
   private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
-    parameterCount = 0;
-    append(writer, "  constructor(");
-    constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
-    append(writer, ") {\n");
+    if (!constructorDeclaration.isPrivate()) {
+      parameterCount = 0;
+      append(writer, "  constructor(");
+      constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
+      append(writer, ") {\n");
 
-    //BODY CONSTRUCTOR
-    append(writer, "  }\n");
+      //BODY CONSTRUCTOR
+      append(writer, "  }\n");
+    }
   }
 
   private void transpileMethod(Writer writer, MethodDeclaration methodDeclaration) {
