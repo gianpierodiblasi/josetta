@@ -28,7 +28,7 @@ public class Prova extends ArrayList {
   private boolean b10;
   private Object b11;
 
-  public Prova(int a) {
+  public Prova(int a, int b) {
   }
 
   public int method(int a, int b) {

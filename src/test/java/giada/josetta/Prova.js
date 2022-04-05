@@ -21,4 +21,10 @@ class Prova extends ArrayList {
   b9 = null;
   b10 = false;
   b11 = null;
+
+  constructor(a, b) {
+  }
+
+  method(a, b) {
+  }
 }
