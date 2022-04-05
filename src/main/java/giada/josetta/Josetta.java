@@ -11,6 +11,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class Josetta {
 
@@ -93,9 +99,46 @@ public class Josetta {
     }
     return writer;
   }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void transpileDir(Josetta josetta, File in, File out) throws Exception {
+    if (!in.exists() || in.isHidden()) {
+    } else if (in.isDirectory()) {
+      for (File child : in.listFiles((dir, name) -> name.toLowerCase().endsWith(".java"))) {
+        transpileDir(josetta, child, new File(out, child.getName()));
+      }
+    } else if (in.isFile()) {
+      out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
+      System.out.println("transpile " + in + " to " + out);
+      josetta.transpile(in, out);
+    }
+  }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public static void main(String[] args) {
+    Options options = new Options();
+    options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("inDir").required().build());
+    options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("outDir").required().build());
+    options.addOption(Option.builder("w").desc("Watch for file changes").argName("w").build());
+
+    try {
+      CommandLine cmd = new DefaultParser().parse(options, args);
+
+      if (cmd.hasOption("w")) {
+      } else {
+        File inDir = new File(cmd.getOptionValue("inDir"));
+        File outDir = new File(cmd.getOptionValue("inDir"));
+        transpileDir(new Josetta(), inDir, outDir);
+      }
+    } catch (ParseException ex) {
+      System.out.println(ex.getMessage());
+      new HelpFormatter().printHelp("Options info", options);
+    } catch (Exception ex) {
+      System.out.println(ex.getMessage());
+    }
+  }
 }
 
-//
 //    methodDeclaration.getBody().ifPresent(body -> {
 //      if (body.isAssertStmt()) {
 //        throw new RuntimeException(body.toString() + "NOT MANAGED");
