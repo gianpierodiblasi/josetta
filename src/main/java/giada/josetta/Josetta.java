@@ -1,16 +1,14 @@
 package giada.josetta;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.CompilationUnit;
+import giada.josetta.es6.ES6CompilationUnit;
+import giada.josetta.transpiler.JosettaCompilationUnit;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
+import java.nio.file.Files;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -18,88 +16,86 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * The main class
+ *
+ * @author gianpiero.di.blasi
+ */
 public class Josetta {
 
-  private String className;
-  private int parameterCount;
+  /**
+   * Transpiles a Java code
+   *
+   * @param javacode The java code
+   * @return The ES6
+   * @throws Exception thrown if an error occurs
+   */
+  public String transpile(String javacode) throws Exception {
+    CompilationUnit javaCompilationUnit = StaticJavaParser.parse(javacode);
+    ES6CompilationUnit es6CompilationUnit = new ES6CompilationUnit();
+    
+    new JosettaCompilationUnit().transpile(javaCompilationUnit, es6CompilationUnit);
+    
+    return es6CompilationUnit.toString();
+  }
 
+  /**
+   * Transpiles a file into another file
+   *
+   * @param in The input file
+   * @param out The output file
+   * @throws Exception thrown if an error occurs
+   */
   public void transpile(File in, File out) throws Exception {
+    String esCode = this.transpile(Files.readString(in.toPath()));
+
     try ( Writer writer = new BufferedWriter(new FileWriter(out))) {
-      StaticJavaParser.parse(in).findAll(ClassOrInterfaceDeclaration.class).forEach(declaration -> transpileClass(writer, declaration));
-    } catch (Exception ex) {
-      out.delete();
-      throw ex;
+      writer.write(esCode);
     }
   }
 
-  private void transpileClass(Writer writer, ClassOrInterfaceDeclaration classDeclaration) {
-    className = classDeclaration.getNameAsString();
-    append(writer, "class ", className);
-    classDeclaration.getExtendedTypes().forEach(extendedType -> append(writer, " extends ", extendedType.getNameAsString()));
-    append(writer, " {\n");
-
-    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(writer, declaration));
-    append(writer, "\n");
-
-    List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
-    if (constructors.size() > 1) {
-      throw new RuntimeException("Class " + className + " has more than one constructor");
-    } else {
-      constructors.forEach(constructorDeclaration -> transpileConstructor(writer, constructorDeclaration));
-    }
-    append(writer, "\n");
-
-    classDeclaration.getMethods().forEach(declaration -> transpileMethod(writer, declaration));
-
-    append(writer, "}");
-  }
-
-  private void transpileClassParameter(Writer writer, FieldDeclaration fieldDeclaration) {
-    fieldDeclaration.getVariables().forEach(variable -> {
-      append(writer, "  ", variable.getNameAsString(), " = ");
-      variable.getInitializer().ifPresentOrElse(
-              expression -> new ExpressionTranspiler().transpile(writer, className, expression),
-              () -> new ClassParameterInitializationTranspiler().transpile(writer, className, variable)
-      );
-      append(writer, ";\n");
-    });
-  }
-
-  private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
-    if (!constructorDeclaration.isPrivate()) {
-      parameterCount = 0;
-      append(writer, "  constructor(");
-      constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
-      append(writer, ") {\n");
-
-      //BODY CONSTRUCTOR
-      append(writer, "  }\n");
-    }
-  }
-
-  private void transpileMethod(Writer writer, MethodDeclaration methodDeclaration) {
-    parameterCount = 0;
-    String methodName = methodDeclaration.getNameAsString();
-
-    append(writer, "  ", methodName, "(");
-    methodDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
-    append(writer, ") {\n");
-
-    //BODY METHOD
-    append(writer, "  }\n");
-  }
-
-  private Writer append(Writer writer, String... args) {
-    for (String arg : args) {
-      try {
-        writer.append(arg);
-      } catch (IOException ex) {
-        throw new RuntimeException(ex);
-      }
-    }
-    return writer;
-  }
-
+//  private void transpileClassParameter(Writer writer, FieldDeclaration fieldDeclaration) {
+//    fieldDeclaration.getVariables().forEach(variable -> {
+//      append(writer, "  ", variable.getNameAsString(), " = ");
+//      variable.getInitializer().ifPresentOrElse(
+//              expression -> new ExpressionTranspiler().transpile(writer, className, expression),
+//              () -> new ClassParameterInitializationTranspiler().transpile(writer, className, variable)
+//      );
+//      append(writer, ";\n");
+//    });
+//  }
+//  private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
+//    if (!constructorDeclaration.isPrivate()) {
+//      parameterCount = 0;
+//      append(writer, "  constructor(");
+//      constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
+//      append(writer, ") {\n");
+//
+//      //BODY CONSTRUCTOR
+//      append(writer, "  }\n");
+//    }
+//  }
+//  private void transpileMethod(Writer writer, MethodDeclaration methodDeclaration) {
+//    parameterCount = 0;
+//    String methodName = methodDeclaration.getNameAsString();
+//
+//    append(writer, "  ", methodName, "(");
+//    methodDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
+//    append(writer, ") {\n");
+//
+//    //BODY METHOD
+//    append(writer, "  }\n");
+//  }
+//  private Writer append(Writer writer, String... args) {
+//    for (String arg : args) {
+//      try {
+//        writer.append(arg);
+//      } catch (IOException ex) {
+//        throw new RuntimeException(ex);
+//      }
+//    }
+//    return writer;
+//  }
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static void transpileDir(Josetta josetta, File in, File out) throws Exception {
     if (!in.exists() || in.isHidden()) {
