@@ -6,6 +6,9 @@ public class Prova {
   public String b = "ciao";
   protected double c = 1;
 
+  public Prova(int a) {
+  }
+
   public int method(int a, int b) {
     return a + b;
   }
