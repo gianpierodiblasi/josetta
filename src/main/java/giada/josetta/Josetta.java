@@ -1,64 +1,100 @@
 package giada.josetta;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 public class Josetta {
 
-  public static void transpile(File in, File out) throws Exception {
-    StringBuilder builder = new StringBuilder();
+  private String className;
+  private int parameterCount;
 
-    CompilationUnit compilationUnit = StaticJavaParser.parse(in);
-    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(declaration -> transpileClass(builder, declaration));
-
-    try ( BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
-      writer.write(builder.toString());
+  public void transpile(File in, File out) throws Exception {
+    try ( Writer writer = new BufferedWriter(new FileWriter(out))) {
+      StaticJavaParser.parse(in).findAll(ClassOrInterfaceDeclaration.class).forEach(declaration -> transpileClass(writer, declaration));
+    } catch (Exception ex) {
+      out.delete();
+      throw ex;
     }
   }
 
-  private static void transpileClass(StringBuilder builder, ClassOrInterfaceDeclaration classDeclaration) {
-    String name = classDeclaration.getNameAsString();
-    builder.append("class ").append(name);
-    classDeclaration.getExtendedTypes().forEach(extendedType -> builder.append(" extends ").append(extendedType.getNameAsString()));
-    builder.append(" {\n");
+  private void transpileClass(Writer writer, ClassOrInterfaceDeclaration classDeclaration) {
+    className = classDeclaration.getNameAsString();
+    append(writer, "class ", className);
+    classDeclaration.getExtendedTypes().forEach(extendedType -> append(writer, " extends ", extendedType.getNameAsString()));
+    append(writer, " {\n");
 
-    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(builder, name, declaration));
+    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(writer, declaration));
+    append(writer, "\n");
 
     List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
-    if (constructors.size() > 1) {
-      throw new RuntimeException("Class " + name + " has more than one constructor");
+    if (constructors.isEmpty()) {
+      append(writer, "  constructor() {}\n");
+    } else if (constructors.size() > 1) {
+      throw new RuntimeException("Class " + className + " has more than one constructor");
+    } else {
+      constructors.forEach(constructorDeclaration -> transpileConstructor(writer, constructorDeclaration));
     }
-    builder.append("\n");
+    append(writer, "\n");
 
-//    classDeclaration.getMethods().forEach(declaration -> transpileMethod(builder, declaration));
-    builder.append("}");
+    classDeclaration.getMethods().forEach(declaration -> transpileMethod(writer, declaration));
+
+    append(writer, "}");
   }
 
-  private static void transpileClassParameter(StringBuilder builder, String name, FieldDeclaration fieldDeclaration) {
+  private void transpileClassParameter(Writer writer, FieldDeclaration fieldDeclaration) {
     fieldDeclaration.getVariables().forEach(variable -> {
-      builder.append("  ").append(variable.getNameAsString());
+      append(writer, "  ", variable.getNameAsString(), " = ");
       variable.getInitializer().ifPresentOrElse(
-              expression -> ExpressionTranspiler.transpile(builder.append(" = "), name, expression),
-              () -> ClassParameterInitializationTranspiler.transpile(builder.append(" = "), name, variable)
+              expression -> new ExpressionTranspiler().transpile(writer, className, expression),
+              () -> new ClassParameterInitializationTranspiler().transpile(writer, className, variable)
       );
-      builder.append(";\n");
+      append(writer, ";\n");
     });
   }
 
-//  private static void transpileMethod(StringBuilder builder, MethodDeclaration methodDeclaration) {
-//    String name = methodDeclaration.getNameAsString();
-//
-//    builder.append("  ").append(name).append("(");
-//    int len = builder.length();
-//    methodDeclaration.getParameters().forEach(parameter -> builder.append(len != builder.length() ? ", " : "").append(parameter.getNameAsString()));
-//    builder.append(") {\n");
+  private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
+    parameterCount = 0;
+    append(writer, "  constructor(");
+    constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
+    append(writer, ") {\n");
+
+    //BODY CONSTRUCTOR
+    append(writer, "  }\n");
+  }
+
+  private void transpileMethod(Writer writer, MethodDeclaration methodDeclaration) {
+    parameterCount = 0;
+    String methodName = methodDeclaration.getNameAsString();
+
+    append(writer, "  ", methodName, "(");
+    methodDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
+    append(writer, ") {\n");
+
+    //BODY METHOD
+    append(writer, "  }\n");
+  }
+
+  private Writer append(Writer writer, String... args) {
+    for (String arg : args) {
+      try {
+        writer.append(arg);
+      } catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    return writer;
+  }
+}
+
 //
 //    methodDeclaration.getBody().ifPresent(body -> {
 //      if (body.isAssertStmt()) {
@@ -109,9 +145,4 @@ public class Josetta {
 //        throw new RuntimeException(body.toString() + "NOT MANAGED");
 //      }
 //    });
-//
-//    builder.append("  }\n");
-//  }
-  private Josetta() {
-  }
-}
+

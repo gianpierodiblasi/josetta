@@ -2,23 +2,24 @@ package giada.josetta;
 
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.Type;
+import java.io.IOException;
+import java.io.Writer;
 
 public class ClassParameterInitializationTranspiler {
 
-  private static boolean done = false;
+  private boolean done;
 
-  public static void transpile(StringBuilder builder, String name, VariableDeclarator variableDeclarator) {
+  public void transpile(Writer writer, String className, VariableDeclarator variableDeclarator) {
     done = false;
+
     Type type = variableDeclarator.getType();
-
-    type.ifArrayType(ty -> throwException(name, type));
-
-    type.ifClassOrInterfaceType(ty -> append(builder, "null"));
-    type.ifIntersectionType(ty -> throwException(name, type));
+    type.ifArrayType(ty -> throwException(className, type));
+    type.ifClassOrInterfaceType(ty -> append(writer, "null"));
+    type.ifIntersectionType(ty -> throwException(className, type));
     type.ifPrimitiveType(ty -> {
       switch (ty.getType()) {
         case BOOLEAN:
-          append(builder, false);
+          append(writer, false);
           break;
         case BYTE:
         case SHORT:
@@ -26,36 +27,37 @@ public class ClassParameterInitializationTranspiler {
         case LONG:
         case FLOAT:
         case DOUBLE:
-          append(builder, 0);
+          append(writer, 0);
           break;
         case CHAR:
-          append(builder, "\"\"");
+          append(writer, "\"\"");
           break;
       }
     });
-    type.ifReferenceType(ty -> throwException(name, type));
-    type.ifUnionType(ty -> throwException(name, type));
-    type.ifUnknownType(ty -> throwException(name, type));
-    type.ifVarType(ty -> throwException(name, type));
-    type.ifVoidType(ty -> throwException(name, type));
-    type.ifWildcardType(ty -> throwException(name, type));
+    type.ifReferenceType(ty -> throwException(className, type));
+    type.ifUnionType(ty -> throwException(className, type));
+    type.ifUnknownType(ty -> throwException(className, type));
+    type.ifVarType(ty -> throwException(className, type));
+    type.ifVoidType(ty -> throwException(className, type));
+    type.ifWildcardType(ty -> throwException(className, type));
 
-    throwException(name, type);
+    throwException(className, type);
   }
 
-  private static void append(StringBuilder builder, Object object) {
+  private void append(Writer writer, Object object) {
     if (!done) {
-      builder.append(object);
+      try {
+        writer.append(object.toString());
+      } catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
       done = true;
     }
   }
 
-  private static void throwException(String name, Type type) {
+  private void throwException(String className, Type type) {
     if (!done) {
-      throw new RuntimeException("Class " + name + ": variable declaration type not yet handled => [" + type.getClass().getSimpleName() + "]" + type);
+      throw new RuntimeException("Class " + className + ": variable declaration type not yet handled => [" + type.getClass().getSimpleName() + "]" + type);
     }
-  }
-
-  private ClassParameterInitializationTranspiler() {
   }
 }
