@@ -4,10 +4,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import giada.josetta.es6.ES6CompilationUnit;
 import giada.josetta.transpiler.JosettaCompilationUnit;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -47,23 +44,21 @@ public class Josetta {
    * @throws Exception thrown if an error occurs
    */
   public void transpile(File in, File out) throws Exception {
-    String esCode = this.transpile(Files.readString(in.toPath()));
-
-    try ( Writer writer = new BufferedWriter(new FileWriter(out))) {
-      writer.write(esCode);
-    }
+    String javaCode = Files.readString(in.toPath());
+    String esCode = this.transpile(javaCode);
+    Files.writeString(out.toPath(), esCode);
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private void transpileDir(File in, File out) throws Exception {
     if (!in.exists() || in.isHidden()) {
     } else if (in.isDirectory()) {
-      for (File child : in.listFiles((dir, name) -> name.toLowerCase().endsWith(".java"))) {
+      for (File child : in.listFiles()) {
         this.transpileDir(child, new File(out, child.getName()));
       }
-    } else if (in.isFile()) {
-      out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
-      System.out.println("transpile " + in + " to " + out);
+    } else if (in.isFile() && in.getName().toLowerCase().endsWith(".java")) {
+      out = new File(out.getParentFile(), out.getName().toLowerCase().replace(".java", ".js"));
+      System.out.println("transpiling " + in + " into " + out);
       this.transpile(in, out);
     }
   }
@@ -73,7 +68,7 @@ public class Josetta {
     Options options = new Options();
     options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("in").required().build());
     options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("out").required().build());
-    options.addOption(Option.builder("w").desc("Watch for file changes").argName("w").build());
+    options.addOption(Option.builder("w").desc("Watch for files changes").argName("w").build());
 
     try {
       CommandLine cmd = new DefaultParser().parse(options, args);
