@@ -7,7 +7,7 @@ A Java to ES6 Transpiler (WORK IN PROGRESS!)
 josetta is the inverted acronym of A Transpiler To ES6 of Old Java, or if you prefer is the union of Java and
 [Rosetta](https://en.wikipedia.org/wiki/Rosetta_Stone).
 
-Aside from these funny word games, josetta is my personal attempt to develop a Java to ES6 translator. josetta is used in my other
+Aside from these funny word games, josetta is my personal attempt to develop a Java to ES6 transpiler. josetta is used in my other
 projects so its development follows my needs in those projects. As a result, only a small fraction (probably less than 10%) of 
 all Java specifications are correctly handled.
 
