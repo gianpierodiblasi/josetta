@@ -1,8 +1,10 @@
 package giada.josetta.transpiler;
 
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.type.Type;
 import giada.josetta.es6.ES6VariableDeclarator;
 import giada.josetta.util.JosettaException;
+import giada.josetta.util.JosettaStringBuilder;
 
 /**
  * The transpiler of a variable declarator
@@ -28,11 +30,47 @@ public class JosettaVariableDeclarator {
                   throw new RuntimeException(ex.getMessage());
                 }
               },
-              () -> {/*new ClassParameterInitializationTranspiler().transpile(writer, className, variable)*/
+              () -> {
+                try {
+                  es6Declarator.getInitializer().setExpression(this.getDefaultInitializer(javaDeclarator));
+                } catch (JosettaException ex) {
+                  throw new RuntimeException(ex.getMessage());
+                }
               }
       );
     } catch (RuntimeException ex) {
       throw new JosettaException(ex.getMessage());
+    }
+  }
+
+  private String getDefaultInitializer(VariableDeclarator variableDeclarator) throws JosettaException {
+    JosettaStringBuilder builder = new JosettaStringBuilder();
+
+    Type type = variableDeclarator.getType();
+    type.ifClassOrInterfaceType(ty -> builder.append("null"));
+    type.ifPrimitiveType(ty -> {
+      switch (ty.getType()) {
+        case BOOLEAN:
+          builder.append(false);
+          break;
+        case BYTE:
+        case SHORT:
+        case INT:
+        case LONG:
+        case FLOAT:
+        case DOUBLE:
+          builder.append(0);
+          break;
+        case CHAR:
+          builder.append("\"\"");
+          break;
+      }
+    });
+
+    if (builder.isEmpty()) {
+      throw new JosettaException("Variable declaration type not yet handled => [" + type.getClass().getSimpleName() + "]" + type);
+    } else {
+      return builder.toString();
     }
   }
 }
