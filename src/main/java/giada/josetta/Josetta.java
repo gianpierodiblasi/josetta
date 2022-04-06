@@ -113,8 +113,8 @@ public class Josetta {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("inDir").required().build());
-    options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("outDir").required().build());
+    options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("in").required().build());
+    options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("out").required().build());
     options.addOption(Option.builder("w").desc("Watch for file changes").argName("w").build());
 
     try {
@@ -122,9 +122,9 @@ public class Josetta {
 
       if (cmd.hasOption("w")) {
       } else {
-        File inDir = new File(cmd.getOptionValue("inDir"));
-        File outDir = new File(cmd.getOptionValue("inDir"));
-        transpileDir(new Josetta(), inDir, outDir);
+        File in = new File(cmd.getOptionValue("in"));
+        File out = new File(cmd.getOptionValue("out"));
+        transpileDir(new Josetta(), in, out);
       }
     } catch (ParseException ex) {
       System.out.println(ex.getMessage());

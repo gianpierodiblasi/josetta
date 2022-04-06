@@ -1,5 +1,5 @@
 # josetta
-A Java to ES6 Transpiler (WORK IN PROGRESS!!!!)
+A Java to ES6 Transpiler (WORK IN PROGRESS!)
 
 ## Description
 ![josetta.jpeg](https://github.com/gianpierodiblasi/josetta/blob/master/josetta.jpeg?raw=true)
@@ -12,7 +12,7 @@ projects so its development follows my needs in those projects. As a result, onl
 all Java specifications are correctly handled.
 
 josetta is ***NOT*** a production ready tool; if you need a professional Java to JavaScript transpiler then I suggest to use
-[JSweet](https://jsweet.org).
+[JSweet](https://jsweet.org). I started to use JSweet but I was not able to successfully integrate it into my development flow.
 
 ## Writing Java code
 josetta correctly handles a very small portion of Java, so there are a lot of limitations and conventions to follow:
@@ -42,9 +42,20 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 
 ## Build
 josetta is developed in [NetBeans](https://netbeans.apache.org/) as a [maven](https://maven.apache.org/) project.
-In order to perform a build you can use maven cli or any IDE compatible with maven.
+In order to perform a build you can use maven CLI or any IDE compatible with maven.
 
 ## Run
+josetta can be embedded in your Java project or can be used by its CLI. The following is an example how to run josetta by command line:
+```
+java -jar <josetta-jar> -in <in> -out <out> -w
+```
+The following table explains the paramters
+
+| parameter   | Description             | Mandatory |
+| ----------- | ----------------------- | --------- |
+| in          | the input file/folder   | true      |
+| out         | the output file/folder  | true      |
+| w           | if available josetta will indefinitely watch for file changes in the input folder and automatically transpile the file  | false      |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
