@@ -2,6 +2,7 @@ package giada.josetta.transpiler;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import giada.josetta.es6.ES6ClassDeclaration;
+import giada.josetta.es6.ES6VariableDeclarator;
 import giada.josetta.util.JosettaException;
 
 /**
@@ -30,7 +31,7 @@ public class JosettaClassDeclaration {
 
       javaDeclaration.getFields().forEach(javaFieldDeclaration -> javaFieldDeclaration.getVariables().forEach(variableDeclarator -> {
         try {
-          new JosettaVariableDeclarator().transpile(variableDeclarator, es6Declaration.addVariable(variableDeclarator.getNameAsString()));
+          new JosettaVariableDeclarator().transpile(variableDeclarator, es6Declaration.addVariable(variableDeclarator.getNameAsString(), javaFieldDeclaration.isStatic() ? ES6VariableDeclarator.Type.STATIC_INSTANCE : ES6VariableDeclarator.Type.INSTANCE));
         } catch (JosettaException ex) {
           throw new RuntimeException(ex.getMessage());
         }

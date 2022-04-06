@@ -15,6 +15,7 @@ public class ES6ClassDeclaration {
   private final String className;
   private String extendedClassName;
   private final HashMap<String, ES6VariableDeclarator> variableDeclarator = new LinkedHashMap<>();
+  private final HashMap<String, ES6VariableDeclarator> constructorDeclarations = new LinkedHashMap<>();
   private final HashMap<String, ES6VariableDeclarator> methodDeclarations = new LinkedHashMap<>();
 
   /**
@@ -46,17 +47,18 @@ public class ES6ClassDeclaration {
    * Adds a new variable
    *
    * @param variableName The variable name
+   * @param type The variable type
    * @return The new variable declarator
-   * @throws JosettaException thrown if the variable name is already used (also as
-   * a method name)
+   * @throws JosettaException thrown if the variable name is already used (also
+   * as a method name)
    */
-  public ES6VariableDeclarator addVariable(String variableName) throws JosettaException {
+  public ES6VariableDeclarator addVariable(String variableName, ES6VariableDeclarator.Type type) throws JosettaException {
     if (this.variableDeclarator.containsKey(variableName)) {
       throw new JosettaException("Variable name " + variableName + " is already used");
     } else if (this.methodDeclarations.containsKey(variableName)) {
       throw new JosettaException("Variable name " + variableName + " is already used as a method name");
     } else {
-      return this.variableDeclarator.put(variableName, new ES6VariableDeclarator(variableName));
+      return this.variableDeclarator.put(variableName, new ES6VariableDeclarator(variableName, type));
     }
   }
 
@@ -65,8 +67,15 @@ public class ES6ClassDeclaration {
     JosettaStringBuilder builder = new JosettaStringBuilder().
             append("class ", className).
             appendIf(() -> extendedClassName != null, "extends ", extendedClassName).
-            append(" {\n").
-            append("}\n");
+            append(" {\n");
+
+    this.variableDeclarator.forEach((key, value) -> builder.append(value.toString(), "\n"));
+    builder.append("\n");
+//    this.constructorDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
+//    builder.append("\n");
+//    this.methodDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
+
+    builder.append("}\n");
 
     return builder.toString();
   }
