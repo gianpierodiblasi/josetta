@@ -49,6 +49,14 @@ public class JosettaStringBuilder {
     return this.builder.length() == 0;
   }
 
+  /**
+   * Returns the length of this builder
+   * @return The length of this builder
+   */
+  public int length() {
+    return this.builder.length();
+  }
+  
   @Override
   public String toString() {
     return this.builder.toString();

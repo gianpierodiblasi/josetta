@@ -99,7 +99,7 @@ public class JosettaExpression {
 
       javaExpression.ifAssignExpr(exp -> {
         try {
-          builder.append(this.transpile(exp.getTarget()), " ", exp.getOperator().asString(), this.transpile(exp.getValue()));
+          builder.append(this.transpile(exp.getTarget()), " ", exp.getOperator().asString(), " ", this.transpile(exp.getValue()));
         } catch (JosettaException ex) {
           throw new RuntimeException(ex.getMessage());
         }

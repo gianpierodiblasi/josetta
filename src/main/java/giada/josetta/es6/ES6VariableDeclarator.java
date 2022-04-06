@@ -63,7 +63,7 @@ public class ES6VariableDeclarator {
             append(this.variableName).
             appendIf(() -> this.type != Type.PARAMETER, " = ").
             append(this.es6Expression.toString()).
-            appendIf(() -> this.type != Type.PARAMETER, ";");
+            appendIf(() -> this.type == Type.INSTANCE || this.type == Type.STATIC, ";");
 
     return builder.toString();
   }

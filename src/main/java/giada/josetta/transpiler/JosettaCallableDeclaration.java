@@ -30,7 +30,7 @@ public class JosettaCallableDeclaration<T extends CallableDeclaration<T>, S exte
     try {
       javaDeclaration.ifMethodDeclaration(declaration -> declaration.getBody().ifPresent(body -> {
         try {
-          es6Declaration.setBody(this.transpile(body, ""));
+          es6Declaration.setBody(this.transpile(body, "  "));
         } catch (JosettaException ex) {
           throw new RuntimeException(ex.getMessage());
         }
@@ -60,7 +60,8 @@ public class JosettaCallableDeclaration<T extends CallableDeclaration<T>, S exte
                     throw new RuntimeException(ex.getMessage());
                   }
                 }).collect(Collectors.joining("\n"))).
-                append("}");
+                appendIf(() -> builder.length() > 2, "\n").
+                append(indent, "}");
       });
 
       statement.ifReturnStmt(stmt -> {
@@ -68,7 +69,7 @@ public class JosettaCallableDeclaration<T extends CallableDeclaration<T>, S exte
           try {
             ES6Expression es6Expression = new ES6Expression();
             new JosettaExpression().transpile(expression, es6Expression);
-            builder.append(indent, es6Expression.toString(), ";");
+            builder.append(indent, "return ", es6Expression.toString(), ";");
           } catch (JosettaException ex) {
             throw new RuntimeException(ex.getMessage());
           }
