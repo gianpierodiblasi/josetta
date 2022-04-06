@@ -1,8 +1,6 @@
 package giada.josetta.es6;
 
 import giada.josetta.util.JosettaStringBuilder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -10,18 +8,7 @@ import java.util.stream.Collectors;
  *
  * @author gianpiero.di.blasi
  */
-public class ES6ConstructorDeclaration {
-
-  private final List<String> parameters = new ArrayList<>();
-
-  /**
-   * Adds a parameter
-   *
-   * @param parameter The parameter
-   */
-  public void addParameter(String parameter) {
-    this.parameters.add(parameter);
-  }
+public class ES6ConstructorDeclaration extends ES6CallableDeclaration {
 
   @Override
   public String toString() {
