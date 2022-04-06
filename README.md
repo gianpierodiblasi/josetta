@@ -30,8 +30,8 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - always use the "this." prefix to reference a parameter or a method
 - always use the "ClassName." prefix to reference a static parameter or a static method
 - primitive types are covered
-- all Java objects in all Java packages (Object, String, etc.) are not covered
-- collections (array, list, map, tree, etc.) are not covered, as an alternative the array oject in
+- all Java objects in all Java packages (Object, String, Math, etc.) are not covered
+- collections (array, list, map, tree, etc.) are not covered, as an alternative the Array oject in
 [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/) can be used
 - in general standard DOM and JS objects can be "simulated" by using
 [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
