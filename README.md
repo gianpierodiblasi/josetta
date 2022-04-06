@@ -51,11 +51,11 @@ java -jar <josetta-jar> -in <in> -out <out> -w
 ```
 The following table explains the paramters
 
-| Parameter   | Description             | Mandatory |
-| ----------- | ----------------------- | --------- |
-| in          | the input file/folder   | true      |
-| out         | the output file/folder  | true      |
-| w           | if available josetta will indefinitely watch for file changes in the input folder and automatically transpile the file  | false      |
+| Parameter | Description | Mandatory |
+| - | - | - |
+| in  | the input file/folder  | true |
+| out | the output file/folder | true |
+| w   | if available josetta will indefinitely watch for files changes in the input folder and automatically transpile the files | false |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
