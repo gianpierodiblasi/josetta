@@ -2,7 +2,7 @@
 A Java to ES6 Transpiler (WORK IN PROGRESS!)
 
 ## Description
-![josetta.jpeg](https://github.com/gianpierodiblasi/josetta/blob/master/josetta.jpeg?raw=true)
+![josetta.png](https://github.com/gianpierodiblasi/josetta/blob/master/josetta.png?raw=true)
 
 josetta is the inverted acronym of A Transpiler To ES6 of Old Java, or if you prefer is the union of Java and
 [Rosetta](https://en.wikipedia.org/wiki/Rosetta_Stone).
