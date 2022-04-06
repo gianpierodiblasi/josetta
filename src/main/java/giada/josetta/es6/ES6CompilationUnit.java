@@ -1,9 +1,9 @@
 package giada.josetta.es6;
 
 import giada.josetta.util.JosettaException;
-import giada.josetta.util.JosettaStringBuilder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The compilation unit of a ES6 code
@@ -33,8 +33,6 @@ public class ES6CompilationUnit {
 
   @Override
   public String toString() {
-    JosettaStringBuilder builder = new JosettaStringBuilder();
-    this.classDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
-    return builder.toString();
+    return this.classDeclarations.values().stream().map(ES6ClassDeclaration::toString).collect(Collectors.joining("\n"));
   }
 }

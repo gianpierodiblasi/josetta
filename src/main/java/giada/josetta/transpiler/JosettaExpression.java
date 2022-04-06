@@ -1,9 +1,10 @@
 package giada.josetta.transpiler;
 
-import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
 import giada.josetta.es6.ES6Expression;
 import giada.josetta.util.JosettaException;
+import giada.josetta.util.JosettaStringBuilder;
+import java.util.stream.Collectors;
 
 /**
  * The transpiler of an expression
@@ -20,26 +21,55 @@ public class JosettaExpression {
    * @throws JosettaException thrown if the expression type is not yet handled
    */
   public void transpile(Expression javaExpression, ES6Expression es6Expression) throws JosettaException {
+    String expression = this.transpile(javaExpression);
+    es6Expression.setExpression(expression);
+  }
+
+  private String transpile(Expression javaExpression) throws JosettaException {
+    JosettaStringBuilder builder = new JosettaStringBuilder();
 
     try {
-      javaExpression.ifBooleanLiteralExpr(exp -> this.setExpression(javaExpression, es6Expression));
-      javaExpression.ifCharLiteralExpr(exp -> this.setExpression(javaExpression, es6Expression));
-      javaExpression.ifDoubleLiteralExpr(exp -> this.setExpression(javaExpression.asDoubleLiteralExpr().asDouble(), es6Expression));
-      javaExpression.ifIntegerLiteralExpr(exp -> this.setExpression(javaExpression.asIntegerLiteralExpr().asNumber(), es6Expression));
-      javaExpression.ifLongLiteralExpr(exp -> this.setExpression(javaExpression.asLongLiteralExpr().asNumber(), es6Expression));
-      javaExpression.ifNullLiteralExpr(exp -> this.setExpression("null", es6Expression));
-      javaExpression.ifStringLiteralExpr(exp -> this.setExpression(javaExpression, es6Expression));
-      javaExpression.ifObjectCreationExpr(exp -> this.setExpression(javaExpression, es6Expression));
+      javaExpression.ifBooleanLiteralExpr(exp -> builder.append(exp));
+      javaExpression.ifCharLiteralExpr(exp -> builder.append(exp));
+      javaExpression.ifDoubleLiteralExpr(exp -> builder.append(exp.asDouble()));
+      javaExpression.ifIntegerLiteralExpr(exp -> builder.append(exp.asNumber()));
+      javaExpression.ifLongLiteralExpr(exp -> builder.append(exp.asNumber()));
+      javaExpression.ifNullLiteralExpr(exp -> builder.append("null"));
+      javaExpression.ifStringLiteralExpr(exp -> builder.append(exp));
+      javaExpression.ifObjectCreationExpr(exp -> builder.append(exp));
+      javaExpression.ifFieldAccessExpr(exp -> builder.append(exp));
 
-      javaExpression.ifBinaryExpr(exp -> {
-        Expression left = exp.getLeft();
-        Operator operator = exp.getOperator();
-        Expression right = exp.getRight();
+      javaExpression.ifMethodCallExpr(exp -> {
+        builder.append(exp.getScope().get(), ".", exp.getName(), "(").
+                append(exp.getArguments().stream().map(argument -> {
+                  try {
+                    return this.transpile(argument);
+                  } catch (JosettaException ex) {
+                    throw new RuntimeException(ex.getMessage());
+                  }
+                }).collect(Collectors.joining(", "))).
+                append(")");
+      });
+
+      javaExpression.ifEnclosedExpr(exp -> {
+        try {
+          builder.append("(", this.transpile(exp.getInner()), ")");
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
       });
 
       javaExpression.ifCastExpr(exp -> {
         try {
-          this.transpile(javaExpression.asCastExpr().getExpression(), es6Expression);
+          builder.append(this.transpile(exp.getExpression()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
+
+      javaExpression.ifBinaryExpr(exp -> {
+        try {
+          builder.append(this.transpile(exp.getLeft()), " ", exp.getOperator().asString(), " ", this.transpile(exp.getRight()));
         } catch (JosettaException ex) {
           throw new RuntimeException(ex.getMessage());
         }
@@ -48,14 +78,10 @@ public class JosettaExpression {
       throw new JosettaException(ex.getMessage());
     }
 
-    if (!es6Expression.hasExpression()) {
+    if (builder.isEmpty()) {
       throw new JosettaException("Expression type not yet handled => [" + javaExpression.getClass().getSimpleName() + "]" + javaExpression);
-    }
-  }
-
-  private void setExpression(Object object, ES6Expression es6Expression) {
-    if (!es6Expression.hasExpression()) {
-      es6Expression.setExpression(object.toString());
+    } else {
+      return builder.toString();
     }
   }
 }

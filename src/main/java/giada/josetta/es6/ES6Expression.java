@@ -18,14 +18,6 @@ public class ES6Expression {
     this.expression = expression;
   }
 
-  /**
-   * Checks if this object has an expression
-   * @return true if this object has an expression, false otherwise
-   */
-  public boolean hasExpression() {
-    return this.expression != null;
-  }
-
   @Override
   public String toString() {
     return this.expression;

@@ -19,9 +19,9 @@ public class JosettaStringBuilder {
    * @return This builder
    */
   public JosettaStringBuilder append(Object obj, Object... others) {
-    builder.append(obj);
+    this.builder.append(obj);
     for (Object other : others) {
-      builder.append(other);
+      this.builder.append(other);
     }
     return this;
   }
@@ -41,8 +41,16 @@ public class JosettaStringBuilder {
     return this;
   }
 
+  /**
+   * Checks if this builder is empty
+   * @return true if this builder is empty, false otherwise 
+   */
+  public boolean isEmpty() {
+    return this.builder.length() == 0;
+  }
+
   @Override
   public String toString() {
-    return builder.toString();
+    return this.builder.toString();
   }
 }
