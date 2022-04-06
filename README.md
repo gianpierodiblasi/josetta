@@ -15,7 +15,7 @@ josetta is ***NOT*** a production ready tool; if you need a professional Java to
 [JSweet](https://jsweet.org).
 
 ## Writing Java code
-josetta correctly handles a very small portion of Java, so there are a lot of limitation and conventions to follow:
+josetta correctly handles a very small portion of Java, so there are a lot of limitations and conventions to follow:
 - packages are not covered, so (for example) two classes with the same name in different packages are not covered
 - imports are covered (they are omitted)
 - interface and classes are covered (public, protected, private and friendly)
