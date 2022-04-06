@@ -22,17 +22,17 @@ public class ES6CompilationUnit {
    * @throws JosettaException throws if the class name is already used
    */
   public ES6ClassDeclaration addClass(String className) throws JosettaException {
-    if (classDeclarations.containsKey(className)) {
+    if (this.classDeclarations.containsKey(className)) {
       throw new JosettaException("Class name " + className + " is already used");
     } else {
-      return classDeclarations.put(className, new ES6ClassDeclaration(className));
+      return this.classDeclarations.put(className, new ES6ClassDeclaration(className));
     }
   }
 
   @Override
   public String toString() {
     JosettaStringBuilder builder = new JosettaStringBuilder();
-    classDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
+    this.classDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
     return builder.toString();
   }
 }

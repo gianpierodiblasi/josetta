@@ -22,16 +22,10 @@ public class JosettaCompilationUnit {
   public void transpile(CompilationUnit javaCompilationUnit, ES6CompilationUnit es6CompilationUnit) throws JosettaException {
     try {
       javaCompilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(javaDeclaration -> {
-        String className = javaDeclaration.getNameAsString();
-
-        if (javaDeclaration.isInterface()) {
-          throw new RuntimeException(className + " is an interface declaration (NOT MANAGED)");
-        } else {
-          try {
-            new JosettaClassDeclaration().transpile(javaDeclaration, es6CompilationUnit.addClass(className));
-          } catch (JosettaException ex) {
-            throw new RuntimeException(ex.getMessage());
-          }
+        try {
+          new JosettaClassDeclaration().transpile(javaDeclaration, es6CompilationUnit.addClass(javaDeclaration.getNameAsString()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
         }
       });
     } catch (RuntimeException ex) {
