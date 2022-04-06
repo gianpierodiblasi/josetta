@@ -74,6 +74,16 @@ public class JosettaCallableDeclaration<T extends CallableDeclaration<T>, S exte
           }
         }, () -> builder.append(indent, "return;"));
       });
+
+      statement.ifExpressionStmt(stmt -> {
+        try {
+          ES6Expression es6Expression = new ES6Expression();
+          new JosettaExpression().transpile(stmt.getExpression(), es6Expression);
+          builder.append(indent, es6Expression.toString(), ";");
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
     } catch (RuntimeException ex) {
       throw new JosettaException(ex.getMessage());
     }

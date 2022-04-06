@@ -2,6 +2,7 @@ package giada.josetta.transpiler;
 
 import com.github.javaparser.ast.expr.Expression;
 import giada.josetta.es6.ES6Expression;
+import giada.josetta.es6.ES6VariableDeclarator;
 import giada.josetta.util.JosettaException;
 import giada.josetta.util.JosettaStringBuilder;
 import java.util.stream.Collectors;
@@ -71,6 +72,47 @@ public class JosettaExpression {
       javaExpression.ifBinaryExpr(exp -> {
         try {
           builder.append(this.transpile(exp.getLeft()), " ", exp.getOperator().asString(), " ", this.transpile(exp.getRight()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
+
+      javaExpression.ifVariableDeclarationExpr(exp -> {
+        builder.append(exp.getVariables().stream().map(variable -> {
+          try {
+            ES6VariableDeclarator es6VariableDeclarator = new ES6VariableDeclarator(variable.getNameAsString(), ES6VariableDeclarator.Type.VARIABLE);
+            new JosettaVariableDeclarator().transpile(variable, es6VariableDeclarator);
+            return es6VariableDeclarator.toString();
+          } catch (JosettaException ex) {
+            throw new RuntimeException(ex.getMessage());
+          }
+        }).collect(Collectors.joining("; ")));
+      });
+
+      javaExpression.ifConditionalExpr(exp -> {
+        try {
+          builder.append(this.transpile(exp.getCondition()), " ? ", this.transpile(exp.getThenExpr()), " : " + this.transpile(exp.getElseExpr()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
+
+      javaExpression.ifAssignExpr(exp -> {
+        try {
+          builder.append(this.transpile(exp.getTarget()), " ", exp.getOperator().asString(), this.transpile(exp.getValue()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
+
+      javaExpression.ifUnaryExpr(exp -> {
+        try {
+          if (exp.isPrefix()) {
+            builder.append(exp.getOperator().asString(), this.transpile(exp.getExpression()));
+          }
+          if (exp.isPostfix()) {
+            builder.append(this.transpile(exp.getExpression()), " ", exp.getOperator().asString());
+          }
         } catch (JosettaException ex) {
           throw new RuntimeException(ex.getMessage());
         }
