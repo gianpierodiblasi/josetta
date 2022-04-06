@@ -19,10 +19,8 @@ public class JosettaClassDeclaration {
    * @throws JosettaException throws if an error occurs
    */
   public void transpile(ClassOrInterfaceDeclaration javaDeclaration, ES6ClassDeclaration es6Declaration) throws JosettaException {
-//    append(writer, "class ", className);
-//    classDeclaration.getExtendedTypes().forEach(extendedType -> append(writer, " extends ", extendedType.getNameAsString()));
-//    append(writer, " {\n");
-//
+    javaDeclaration.getExtendedTypes().forEach(extendedType -> es6Declaration.setExtends(extendedType.getNameAsString()));
+
 //    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(writer, declaration));
 //    append(writer, "\n");
 //
