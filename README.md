@@ -51,7 +51,7 @@ java -jar <josetta-jar> -in <in> -out <out> -w
 ```
 The following table explains the paramters
 
-| parameter   | Description             | Mandatory |
+| Parameter   | Description             | Mandatory |
 | ----------- | ----------------------- | --------- |
 | in          | the input file/folder   | true      |
 | out         | the output file/folder  | true      |
