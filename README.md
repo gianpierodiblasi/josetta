@@ -19,8 +19,8 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - packages are not covered, so (for example) two classes with the same name in different packages are not covered
 - imports are covered (they are omitted)
 - interface and classes are covered (public, protected, private and friendly)
-- class parameters are covered (public, protected, private and friendly)
-- class methods are covered (public, protected, private and friendly)
+- class (static) parameters are covered (public, protected, private and friendly)
+- class (static) methods are covered (public, protected, private and friendly)
 - class constructors are covered (public, protected, private and friendly)
 - constructor overloading is not covered
 - method overloading is not covered
