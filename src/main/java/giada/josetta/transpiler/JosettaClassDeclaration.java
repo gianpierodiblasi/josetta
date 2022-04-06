@@ -16,10 +16,22 @@ public class JosettaClassDeclaration {
    *
    * @param javaDeclaration The Java class declaration
    * @param es6Declaration The ES6 class declaration
-   * @throws JosettaException throws if an error occurs
+   * @throws JosettaException thrown if an error occurs
    */
   public void transpile(ClassOrInterfaceDeclaration javaDeclaration, ES6ClassDeclaration es6Declaration) throws JosettaException {
-    javaDeclaration.getExtendedTypes().forEach(extendedType -> es6Declaration.setExtends(extendedType.getNameAsString()));
+    try {
+      javaDeclaration.getExtendedTypes().forEach(extendedType -> {
+        try {
+          es6Declaration.setExtends(extendedType.getNameAsString());
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      });
+      
+      
+    } catch (RuntimeException ex) {
+      throw new JosettaException(ex.getMessage());
+    }
 
 //    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(writer, declaration));
 //    append(writer, "\n");
@@ -35,6 +47,5 @@ public class JosettaClassDeclaration {
 //    classDeclaration.getMethods().forEach(declaration -> transpileMethod(writer, declaration));
 //
 //    append(writer, "}");
-
   }
 }

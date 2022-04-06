@@ -17,7 +17,7 @@ public class JosettaCompilationUnit {
    *
    * @param javaCompilationUnit The Java compilation unit
    * @param es6CompilationUnit The ES6 compilation unit
-   * @throws JosettaException throws if an error occurs
+   * @throws JosettaException thrown if an error occurs
    */
   public void transpile(CompilationUnit javaCompilationUnit, ES6CompilationUnit es6CompilationUnit) throws JosettaException {
     try {

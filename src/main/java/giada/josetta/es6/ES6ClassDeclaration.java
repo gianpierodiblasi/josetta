@@ -1,5 +1,6 @@
 package giada.josetta.es6;
 
+import giada.josetta.util.JosettaException;
 import giada.josetta.util.JosettaStringBuilder;
 
 /**
@@ -26,9 +27,14 @@ public class ES6ClassDeclaration {
    *
    * @param extendedClassName The name of the extended class
    * @return This class declaration
+   * @throws JosettaException thrown if this class already extends another class
    */
-  public ES6ClassDeclaration setExtends(String extendedClassName) {
-    this.extendedClassName = extendedClassName;
+  public ES6ClassDeclaration setExtends(String extendedClassName) throws JosettaException {
+    if (this.extendedClassName != null) {
+      throw new JosettaException("Class name " + className + " already extends a class, current extended class name = " + this.extendedClassName + ", new extended class name = " + extendedClassName);
+    } else {
+      this.extendedClassName = extendedClassName;
+    }
     return this;
   }
 

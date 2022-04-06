@@ -19,7 +19,7 @@ public class ES6CompilationUnit {
    *
    * @param className The class name
    * @return The new class declaration
-   * @throws JosettaException throws if the class name is already used
+   * @throws JosettaException thrown if the class name is already used
    */
   public ES6ClassDeclaration addClass(String className) throws JosettaException {
     if (this.classDeclarations.containsKey(className)) {

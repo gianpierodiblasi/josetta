@@ -18,6 +18,7 @@ josetta is ***NOT*** a production ready tool; if you need a professional Java to
 josetta correctly handles a very small portion of Java, so there are a lot of limitations and conventions to follow:
 - packages are not covered, so (for example) two classes with the same name in different packages are not covered
 - imports are covered (they are omitted)
+- multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
 - interface and classes are covered (public, protected, private and friendly)
 - class (static) parameters are covered (public, protected, private and friendly)
 - class (static) methods are covered (public, protected, private and friendly)
