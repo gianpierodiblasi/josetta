@@ -1,7 +1,6 @@
 package giada.josetta.es6;
 
 import giada.josetta.util.JosettaStringBuilder;
-import java.util.stream.Collectors;
 
 /**
  * The declaration of a ES6 method
@@ -40,11 +39,7 @@ public class ES6MethodDeclaration extends ES6CallableDeclaration {
 
   @Override
   public String toString() {
-    JosettaStringBuilder builder = new JosettaStringBuilder().
-            append("  ").appendIf(() -> this.type == Type.STATIC, "static ").
-            append(this.methodName, "(").append(this.parameters.stream().collect(Collectors.joining(", "))).append(") {\n").
-            append("  }\n");
-
-    return builder.toString();
+    return new JosettaStringBuilder().
+            append("  ").appendIf(() -> this.type == Type.STATIC, "static ").append(this.methodName, super.toString()).toString();
   }
 }

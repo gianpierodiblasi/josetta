@@ -1,7 +1,9 @@
 package giada.josetta.es6;
 
+import giada.josetta.util.JosettaStringBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The declaration of a ES6 callable (method or constructor)
@@ -10,7 +12,8 @@ import java.util.List;
  */
 public class ES6CallableDeclaration {
 
-  protected final List<String> parameters = new ArrayList<>();
+  private final List<String> parameters = new ArrayList<>();
+  private String body;
 
   /**
    * Adds a parameter
@@ -19,5 +22,24 @@ public class ES6CallableDeclaration {
    */
   public void addParameter(String parameter) {
     this.parameters.add(parameter);
+  }
+
+  /**
+   * Sets the body
+   *
+   * @param body The body
+   */
+  public void setBody(String body) {
+    this.body = body;
+  }
+
+  @Override
+  public String toString() {
+    JosettaStringBuilder builder = new JosettaStringBuilder().
+            append("(", this.parameters.stream().collect(Collectors.joining(", "))).append(") {\n").
+            appendIf(() -> this.body != null && !this.body.isEmpty(), this.body, "\n").
+            append("  }\n");
+
+    return builder.toString();
   }
 }
