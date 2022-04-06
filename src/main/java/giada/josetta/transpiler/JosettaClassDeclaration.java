@@ -27,15 +27,19 @@ public class JosettaClassDeclaration {
           throw new RuntimeException(ex.getMessage());
         }
       });
-      
-      
+
+      javaDeclaration.getFields().forEach(javaFieldDeclaration -> javaFieldDeclaration.getVariables().forEach(variableDeclarator -> {
+        try {
+          new JosettaVariableDeclarator().transpile(variableDeclarator, es6Declaration.addVariable(variableDeclarator.getNameAsString()));
+        } catch (JosettaException ex) {
+          throw new RuntimeException(ex.getMessage());
+        }
+      }));
+
     } catch (RuntimeException ex) {
       throw new JosettaException(ex.getMessage());
     }
 
-//    classDeclaration.getFields().forEach(declaration -> transpileClassParameter(writer, declaration));
-//    append(writer, "\n");
-//
 //    List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
 //    if (constructors.size() > 1) {
 //      throw new RuntimeException("Class " + className + " has more than one constructor");

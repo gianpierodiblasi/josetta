@@ -88,16 +88,6 @@ public class Josetta {
   }
 }
 
-//  private void transpileClassParameter(Writer writer, FieldDeclaration fieldDeclaration) {
-//    fieldDeclaration.getVariables().forEach(variable -> {
-//      append(writer, "  ", variable.getNameAsString(), " = ");
-//      variable.getInitializer().ifPresentOrElse(
-//              expression -> new ExpressionTranspiler().transpile(writer, className, expression),
-//              () -> new ClassParameterInitializationTranspiler().transpile(writer, className, variable)
-//      );
-//      append(writer, ";\n");
-//    });
-//  }
 //  private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
 //    if (!constructorDeclaration.isPrivate()) {
 //      parameterCount = 0;

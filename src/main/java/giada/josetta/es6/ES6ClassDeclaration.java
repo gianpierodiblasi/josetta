@@ -2,6 +2,8 @@ package giada.josetta.es6;
 
 import giada.josetta.util.JosettaException;
 import giada.josetta.util.JosettaStringBuilder;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * The declaration of a ES6 class
@@ -12,6 +14,8 @@ public class ES6ClassDeclaration {
 
   private final String className;
   private String extendedClassName;
+  private final HashMap<String, ES6VariableDeclarator> variableDeclarator = new LinkedHashMap<>();
+  private final HashMap<String, ES6VariableDeclarator> methodDeclarations = new LinkedHashMap<>();
 
   /**
    * Creates a class declaration
@@ -36,6 +40,24 @@ public class ES6ClassDeclaration {
       this.extendedClassName = extendedClassName;
     }
     return this;
+  }
+
+  /**
+   * Adds a new variable
+   *
+   * @param variableName The variable name
+   * @return The new variable declarator
+   * @throws JosettaException thrown if the variable name is already used (also as
+   * a method name)
+   */
+  public ES6VariableDeclarator addVariable(String variableName) throws JosettaException {
+    if (this.variableDeclarator.containsKey(variableName)) {
+      throw new JosettaException("Variable name " + variableName + " is already used");
+    } else if (this.methodDeclarations.containsKey(variableName)) {
+      throw new JosettaException("Variable name " + variableName + " is already used as a method name");
+    } else {
+      return this.variableDeclarator.put(variableName, new ES6VariableDeclarator(variableName));
+    }
   }
 
   @Override
