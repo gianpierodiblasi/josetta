@@ -30,9 +30,9 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - primitive types are covered
 - all Java objects in all Java packages (Object, String, etc.) are not covered
 - collections (array, list, map, tree, etc.) are not covered, as an alternative the array oject in
-[jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/6.0.1/) can be used
+[jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/) can be used
 - in general standard DOM and JS objects can be "simulated" by using
-[jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/6.0.1/)
+[jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
 - any JS external library can be "simulated" (if available) by using
 [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/)
 
@@ -41,7 +41,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - Apache Commons CLI - [link](https://commons.apache.org/proper/commons-cli/)
 
 ## Build
-josetta is developed in (NetBeans)(https://netbeans.apache.org/) as a [maven](https://maven.apache.org/) project.
+josetta is developed in [NetBeans](https://netbeans.apache.org/) as a [maven](https://maven.apache.org/) project.
 In order to perform a build you can use maven cli or any IDE compatible with maven.
 
 ## Run
