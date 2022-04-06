@@ -11,7 +11,7 @@ Aside from these funny word games, josetta is my personal attempt to develop a J
 projects so its development follows my needs in those projects. As a result, only a small fraction (probably less than 10%) of 
 all Java specifications are correctly handled.
 
-josetta is *NOT* a production ready tool; if you need a professional Java to JavaScript transpiler then I suggest to use
+josetta is ***NOT*** a production ready tool; if you need a professional Java to JavaScript transpiler then I suggest to use
 [JSweet](https://jsweet.org).
 
 ## Writing Java code
