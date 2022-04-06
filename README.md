@@ -49,7 +49,7 @@ josetta can be embedded in your Java project or can be used by its CLI. The foll
 ```
 java -jar <josetta-jar> -in <in> -out <out> -w
 ```
-The following table explains the paramters
+The following table explains the parameters
 
 | Parameter | Description | Mandatory |
 | - | - | - |
