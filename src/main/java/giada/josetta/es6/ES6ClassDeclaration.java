@@ -16,8 +16,8 @@ public class ES6ClassDeclaration {
   private final String className;
   private String extendedClassName;
   private final HashMap<String, ES6VariableDeclarator> variableDeclarators = new LinkedHashMap<>();
-  private final HashMap<String, ES6VariableDeclarator> constructorDeclarations = new LinkedHashMap<>();
-  private final HashMap<String, ES6VariableDeclarator> methodDeclarations = new LinkedHashMap<>();
+  private final ES6ConstructorDeclaration constructorDeclaration = new ES6ConstructorDeclaration();
+  private final HashMap<String, ES6MethodDeclaration> methodDeclarations = new LinkedHashMap<>();
 
   /**
    * Creates a class declaration
@@ -26,6 +26,15 @@ public class ES6ClassDeclaration {
    */
   public ES6ClassDeclaration(String className) {
     this.className = className;
+  }
+
+  /**
+   * Returns the name of the class
+   *
+   * @return The name of the class
+   */
+  public String getClassName() {
+    return this.className;
   }
 
   /**
@@ -59,23 +68,49 @@ public class ES6ClassDeclaration {
     } else if (this.methodDeclarations.containsKey(variableName)) {
       throw new JosettaException("Variable name " + variableName + " is already used as a method name");
     } else {
-      ES6VariableDeclarator eS6VariableDeclarator = new ES6VariableDeclarator(variableName, type);
-      this.variableDeclarators.put(variableName, eS6VariableDeclarator);
-      return eS6VariableDeclarator;
+      ES6VariableDeclarator es6VariableDeclarator = new ES6VariableDeclarator(variableName, type);
+      this.variableDeclarators.put(variableName, es6VariableDeclarator);
+      return es6VariableDeclarator;
+    }
+  }
+
+  /**
+   * Returns the constructor declaration
+   *
+   * @return The constructor declaration
+   */
+  public ES6ConstructorDeclaration getConstructorDeclaration() {
+    return this.constructorDeclaration;
+  }
+
+  /**
+   * Adds a new method
+   *
+   * @param methodName The method name
+   * @param type The method type
+   * @return The new method declaration
+   * @throws JosettaException thrown if the variable name is already used (also
+   * as a method name)
+   */
+  public ES6MethodDeclaration addMethod(String methodName, ES6MethodDeclaration.Type type) throws JosettaException {
+    if (this.variableDeclarators.containsKey(methodName)) {
+      throw new JosettaException("Method name " + methodName + " is already used as a variable name");
+    } else if (this.methodDeclarations.containsKey(methodName)) {
+      throw new JosettaException("Method name " + methodName + " is already used");
+    } else {
+      ES6MethodDeclaration es6MethodDeclaration = new ES6MethodDeclaration(methodName, type);
+      this.methodDeclarations.put(methodName, es6MethodDeclaration);
+      return es6MethodDeclaration;
     }
   }
 
   @Override
   public String toString() {
     JosettaStringBuilder builder = new JosettaStringBuilder().
-            append("class ", className).appendIf(() -> extendedClassName != null, "extends ", extendedClassName).append(" {\n").
-            append(this.variableDeclarators.values().stream().map(ES6VariableDeclarator::toString).map(str -> "  " + str).collect(Collectors.joining("\n"))).
-            append("\n").
-            //    this.variableDeclarators.forEach((key, value) -> builder.append("  ", value.toString(), "\n"));
-            //    builder.append("\n");
-            //    this.constructorDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
-            //    builder.append("\n");
-            //    this.methodDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
+            append("class ", this.className).appendIf(() -> this.extendedClassName != null, "extends ", this.extendedClassName).append(" {\n").
+            append(this.variableDeclarators.values().stream().map(ES6VariableDeclarator::toString).map(str -> "  " + str).collect(Collectors.joining("\n")), "\n\n").
+            append(this.constructorDeclaration.toString(), "\n").
+            append(this.methodDeclarations.values().stream().map(ES6MethodDeclaration::toString).collect(Collectors.joining("\n"))).
             append("}\n");
 
     return builder.toString();

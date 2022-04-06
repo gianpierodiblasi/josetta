@@ -88,17 +88,6 @@ public class Josetta {
   }
 }
 
-//  private void transpileConstructor(Writer writer, ConstructorDeclaration constructorDeclaration) {
-//    if (!constructorDeclaration.isPrivate()) {
-//      parameterCount = 0;
-//      append(writer, "  constructor(");
-//      constructorDeclaration.getParameters().forEach(parameter -> append(writer, (parameterCount++) == 0 ? "" : ", ", parameter.getNameAsString()));
-//      append(writer, ") {\n");
-//
-//      //BODY CONSTRUCTOR
-//      append(writer, "  }\n");
-//    }
-//  }
 //  private void transpileMethod(Writer writer, MethodDeclaration methodDeclaration) {
 //    parameterCount = 0;
 //    String methodName = methodDeclaration.getNameAsString();

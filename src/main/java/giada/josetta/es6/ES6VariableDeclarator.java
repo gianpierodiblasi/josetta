@@ -22,9 +22,9 @@ public class ES6VariableDeclarator {
      */
     INSTANCE,
     /**
-     * A static instance variable
+     * A static variable
      */
-    STATIC_INSTANCE,
+    STATIC,
     /**
      * A method/constructor parameter
      */
@@ -58,7 +58,7 @@ public class ES6VariableDeclarator {
   @Override
   public String toString() {
     JosettaStringBuilder builder = new JosettaStringBuilder().
-            appendIf(() -> this.type == Type.STATIC_INSTANCE, "static ").
+            appendIf(() -> this.type == Type.STATIC, "static ").
             appendIf(() -> this.type == Type.VARIABLE, "let ").
             append(this.variableName).
             appendIf(() -> this.type != Type.PARAMETER, " = ").
