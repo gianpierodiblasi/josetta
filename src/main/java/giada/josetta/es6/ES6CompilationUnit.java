@@ -25,7 +25,9 @@ public class ES6CompilationUnit {
     if (this.classDeclarations.containsKey(className)) {
       throw new JosettaException("Class name " + className + " is already used");
     } else {
-      return this.classDeclarations.put(className, new ES6ClassDeclaration(className));
+      ES6ClassDeclaration eS6ClassDeclaration = new ES6ClassDeclaration(className);
+      this.classDeclarations.put(className, eS6ClassDeclaration);
+      return eS6ClassDeclaration;
     }
   }
 

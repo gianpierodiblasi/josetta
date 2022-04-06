@@ -58,7 +58,9 @@ public class ES6ClassDeclaration {
     } else if (this.methodDeclarations.containsKey(variableName)) {
       throw new JosettaException("Variable name " + variableName + " is already used as a method name");
     } else {
-      return this.variableDeclarator.put(variableName, new ES6VariableDeclarator(variableName, type));
+      ES6VariableDeclarator eS6VariableDeclarator = new ES6VariableDeclarator(variableName, type);
+      this.variableDeclarator.put(variableName, eS6VariableDeclarator);
+      return eS6VariableDeclarator;
     }
   }
 
@@ -69,7 +71,7 @@ public class ES6ClassDeclaration {
             appendIf(() -> extendedClassName != null, "extends ", extendedClassName).
             append(" {\n");
 
-    this.variableDeclarator.forEach((key, value) -> builder.append(value.toString(), "\n"));
+    this.variableDeclarator.forEach((key, value) -> builder.append("  ", value.toString(), "\n"));
     builder.append("\n");
 //    this.constructorDeclarations.forEach((key, value) -> builder.append(value.toString(), "\n"));
 //    builder.append("\n");
