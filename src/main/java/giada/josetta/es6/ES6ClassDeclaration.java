@@ -106,13 +106,12 @@ public class ES6ClassDeclaration {
 
   @Override
   public String toString() {
-    JosettaStringBuilder builder = new JosettaStringBuilder().
+    return new JosettaStringBuilder().
             append("class ", this.className).appendIf(() -> this.extendedClassName != null, "extends ", this.extendedClassName).append(" {\n").
             append(this.variableDeclarators.values().stream().map(ES6VariableDeclarator::toString).map(str -> "  " + str).collect(Collectors.joining("\n")), "\n\n").
             append(this.constructorDeclaration.toString(), "\n").
             append(this.methodDeclarations.values().stream().map(ES6MethodDeclaration::toString).collect(Collectors.joining("\n"))).
-            append("}\n");
-
-    return builder.toString();
+            append("}\n").
+            toString();
   }
 }

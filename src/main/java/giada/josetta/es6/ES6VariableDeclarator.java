@@ -57,14 +57,13 @@ public class ES6VariableDeclarator {
 
   @Override
   public String toString() {
-    JosettaStringBuilder builder = new JosettaStringBuilder().
+    return new JosettaStringBuilder().
             appendIf(() -> this.type == Type.STATIC, "static ").
             appendIf(() -> this.type == Type.VARIABLE, "let ").
             append(this.variableName).
             appendIf(() -> this.type != Type.PARAMETER, " = ").
             append(this.es6Expression.toString()).
-            appendIf(() -> this.type == Type.INSTANCE || this.type == Type.STATIC, ";");
-
-    return builder.toString();
+            appendIf(() -> this.type == Type.INSTANCE || this.type == Type.STATIC, ";").
+            toString();
   }
 }
