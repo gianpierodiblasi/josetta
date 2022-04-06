@@ -68,7 +68,7 @@ public class JosettaVariableDeclarator {
     });
 
     if (builder.isEmpty()) {
-      throw new JosettaException("Variable declaration type not yet handled => [" + type.getClass().getSimpleName() + "]" + type);
+      throw new JosettaException("Variable declaration type not yet handled => [" + type.getClass().getSimpleName() + "] " + type);
     } else {
       return builder.toString();
     }

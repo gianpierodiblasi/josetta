@@ -38,6 +38,7 @@ public class JosettaExpression {
       javaExpression.ifStringLiteralExpr(exp -> builder.append(exp));
       javaExpression.ifObjectCreationExpr(exp -> builder.append(exp));
       javaExpression.ifFieldAccessExpr(exp -> builder.append(exp));
+      javaExpression.ifNameExpr(exp -> builder.append(exp));
 
       javaExpression.ifMethodCallExpr(exp -> {
         builder.append(exp.getScope().get(), ".", exp.getName(), "(").
@@ -79,7 +80,7 @@ public class JosettaExpression {
     }
 
     if (builder.isEmpty()) {
-      throw new JosettaException("Expression type not yet handled => [" + javaExpression.getClass().getSimpleName() + "]" + javaExpression);
+      throw new JosettaException("Expression type not yet handled => [" + javaExpression.getClass().getSimpleName() + "] " + javaExpression);
     } else {
       return builder.toString();
     }

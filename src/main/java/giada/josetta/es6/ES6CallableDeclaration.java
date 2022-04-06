@@ -36,9 +36,9 @@ public class ES6CallableDeclaration {
   @Override
   public String toString() {
     JosettaStringBuilder builder = new JosettaStringBuilder().
-            append("(", this.parameters.stream().collect(Collectors.joining(", "))).append(") {\n").
+            append("(", this.parameters.stream().collect(Collectors.joining(", "))).append(") ").
             appendIf(() -> this.body != null && !this.body.isEmpty(), this.body, "\n").
-            append("  }\n");
+            append("\n");
 
     return builder.toString();
   }
