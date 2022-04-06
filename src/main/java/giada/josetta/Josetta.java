@@ -27,15 +27,15 @@ public class Josetta {
    * Transpiles a Java code
    *
    * @param javacode The java code
-   * @return The ES6
+   * @return The ES6 code
    * @throws Exception thrown if an error occurs
    */
   public String transpile(String javacode) throws Exception {
     CompilationUnit javaCompilationUnit = StaticJavaParser.parse(javacode);
     ES6CompilationUnit es6CompilationUnit = new ES6CompilationUnit();
-    
+
     new JosettaCompilationUnit().transpile(javaCompilationUnit, es6CompilationUnit);
-    
+
     return es6CompilationUnit.toString();
   }
 
@@ -53,6 +53,45 @@ public class Josetta {
       writer.write(esCode);
     }
   }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private void transpileDir(File in, File out) throws Exception {
+    if (!in.exists() || in.isHidden()) {
+    } else if (in.isDirectory()) {
+      for (File child : in.listFiles((dir, name) -> name.toLowerCase().endsWith(".java"))) {
+        this.transpileDir(child, new File(out, child.getName()));
+      }
+    } else if (in.isFile()) {
+      out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
+      System.out.println("transpile " + in + " to " + out);
+      this.transpile(in, out);
+    }
+  }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public static void main(String[] args) {
+    Options options = new Options();
+    options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("in").required().build());
+    options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("out").required().build());
+    options.addOption(Option.builder("w").desc("Watch for file changes").argName("w").build());
+
+    try {
+      CommandLine cmd = new DefaultParser().parse(options, args);
+
+      if (cmd.hasOption("w")) {
+      } else {
+        File in = new File(cmd.getOptionValue("in"));
+        File out = new File(cmd.getOptionValue("out"));
+        new Josetta().transpileDir(in, out);
+      }
+    } catch (ParseException ex) {
+      System.out.println(ex.getMessage());
+      new HelpFormatter().printHelp("Options info", options);
+    } catch (Exception ex) {
+      System.out.println(ex.getMessage());
+    }
+  }
+}
 
 //  private void transpileClassParameter(Writer writer, FieldDeclaration fieldDeclaration) {
 //    fieldDeclaration.getVariables().forEach(variable -> {
@@ -96,45 +135,6 @@ public class Josetta {
 //    }
 //    return writer;
 //  }
-  @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private static void transpileDir(Josetta josetta, File in, File out) throws Exception {
-    if (!in.exists() || in.isHidden()) {
-    } else if (in.isDirectory()) {
-      for (File child : in.listFiles((dir, name) -> name.toLowerCase().endsWith(".java"))) {
-        transpileDir(josetta, child, new File(out, child.getName()));
-      }
-    } else if (in.isFile()) {
-      out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
-      System.out.println("transpile " + in + " to " + out);
-      josetta.transpile(in, out);
-    }
-  }
-
-  @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  public static void main(String[] args) {
-    Options options = new Options();
-    options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("in").required().build());
-    options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("out").required().build());
-    options.addOption(Option.builder("w").desc("Watch for file changes").argName("w").build());
-
-    try {
-      CommandLine cmd = new DefaultParser().parse(options, args);
-
-      if (cmd.hasOption("w")) {
-      } else {
-        File in = new File(cmd.getOptionValue("in"));
-        File out = new File(cmd.getOptionValue("out"));
-        transpileDir(new Josetta(), in, out);
-      }
-    } catch (ParseException ex) {
-      System.out.println(ex.getMessage());
-      new HelpFormatter().printHelp("Options info", options);
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
-    }
-  }
-}
-
 //    methodDeclaration.getBody().ifPresent(body -> {
 //      if (body.isAssertStmt()) {
 //        throw new RuntimeException(body.toString() + "NOT MANAGED");

@@ -27,6 +27,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - parameters and methods cannot have the same name
 - "this." and "super." prefixes are covered
 - always use the "this." prefix to reference a parameter or a method
+- always use the "ClassName." prefix to reference a static parameter or a static method
 - primitive types are covered
 - all Java objects in all Java packages (Object, String, etc.) are not covered
 - collections (array, list, map, tree, etc.) are not covered, as an alternative the array oject in
