@@ -19,16 +19,20 @@ public class JosettaVariableDeclarator {
    * @throws JosettaException thrown if an error occurs
    */
   public void transpile(VariableDeclarator javaDeclarator, ES6VariableDeclarator es6Declarator) throws JosettaException {
+    try {
+      javaDeclarator.getInitializer().ifPresentOrElse(
+              expression -> {
+                try {
+                  new JosettaExpression().transpile(expression, es6Declarator.getInitializer());
+                } catch (JosettaException ex) {
+                  throw new RuntimeException(ex.getMessage());
+                }
+              },
+              () -> {/*new ClassParameterInitializationTranspiler().transpile(writer, className, variable)*/
+              }
+      );
+    } catch (RuntimeException ex) {
+      throw new JosettaException(ex.getMessage());
+    }
   }
 }
-
-//  private void transpileClassParameter(Writer writer, FieldDeclarator variableDeclarator) {
-//    variableDeclarator.getVariables().forEach(variable -> {
-//      append(writer, "  ", variable.getNameAsString(), " = ");
-//      variable.getInitializer().ifPresentOrElse(
-//              expression -> new ExpressionTranspiler().transpile(writer, className, expression),
-//              () -> new ClassParameterInitializationTranspiler().transpile(writer, className, variable)
-//      );
-//      append(writer, ";\n");
-//    });
-//  }

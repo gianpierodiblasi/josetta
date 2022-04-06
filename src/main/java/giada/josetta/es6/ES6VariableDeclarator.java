@@ -11,6 +11,7 @@ public class ES6VariableDeclarator {
 
   private final String variableName;
   private final Type type;
+  private final ES6Expression es6Expression = new ES6Expression();
 
   /**
    * The types of variables
@@ -45,12 +46,24 @@ public class ES6VariableDeclarator {
     this.type = type;
   }
 
+  /**
+   * Returns the variable initializer
+   *
+   * @return The variable initializer
+   */
+  public ES6Expression getInitializer() {
+    return this.es6Expression;
+  }
+
   @Override
   public String toString() {
     JosettaStringBuilder builder = new JosettaStringBuilder().
             appendIf(() -> type == Type.STATIC_INSTANCE, "static ").
             appendIf(() -> type == Type.VARIABLE, "let ").
-            append(variableName, ";");
+            append(variableName).
+            appendIf(() -> type != Type.PARAMETER, " = ").
+            append(es6Expression.toString()).
+            appendIf(() -> type != Type.PARAMETER, ";");
 
     return builder.toString();
   }
