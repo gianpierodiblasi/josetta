@@ -111,6 +111,8 @@ public class JosettaChecker {
   }
 
   private static void checkField(FieldDeclaration field) {
+    field.getVariables().forEach(variable -> JosettaChecker.checkVariableDeclarator(variable));
+
     field.setAllTypes(new UnknownType());
     field.setFinal(false);
     field.setPrivate(false);
