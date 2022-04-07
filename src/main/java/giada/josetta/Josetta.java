@@ -4,11 +4,12 @@ import com.github.javaparser.ParseException;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -44,20 +45,20 @@ public class Josetta {
    */
   public static String transpile(String javaCode) throws Exception {
     CompilationUnit compilationUnit = StaticJavaParser.parse(javaCode);
-    
+
     Josetta.codeCleaning(compilationUnit);
     JosettaChecker.checkCompilationUnit(compilationUnit);
-    
+
     JosettaPrinterVisitor visitor = new JosettaPrinterVisitor();
     compilationUnit.accept(visitor, null);
     return visitor.toString();
   }
-  
+
   private static void codeCleaning(CompilationUnit compilationUnit) {
     compilationUnit.removePackageDeclaration();
     compilationUnit.findAll(ImportDeclaration.class).forEach(importDeclaration -> compilationUnit.remove(importDeclaration));
   }
-  
+
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static void transpileDir(File in, File out) throws Exception {
     if (!in.exists() || in.isHidden()) {
@@ -71,21 +72,37 @@ public class Josetta {
       Josetta.transpile(in, out);
     }
   }
-  
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void watch(File in, File out) throws Exception {
+    System.out.println("watching " + in);
+    WatchService watchService = FileSystems.getDefault().newWatchService();
+    in.toPath().register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+    WatchKey watchKey;
+    while ((watchKey = watchService.take()) != null) {
+      watchKey.pollEvents().forEach(event -> {
+        System.out.println("Event kind:" + event.kind() + ". File affected: " + event.context() + ".");
+      });
+      watchKey.reset();
+    }
+  }
+
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void main(String[] args) {
     Options options = new Options();
     options.addOption(Option.builder("in").hasArg().desc("Input dir/file").argName("in").required().build());
     options.addOption(Option.builder("out").hasArg().desc("Output dir/file").argName("out").required().build());
     options.addOption(Option.builder("w").desc("Watch for files changes").argName("w").build());
-    
+
     try {
       CommandLine cmd = new DefaultParser().parse(options, args);
-      
+      File in = new File(cmd.getOptionValue("in"));
+      File out = new File(cmd.getOptionValue("out"));
+
       if (cmd.hasOption("w")) {
+        Josetta.watch(in, out);
       } else {
-        File in = new File(cmd.getOptionValue("in"));
-        File out = new File(cmd.getOptionValue("out"));
         Josetta.transpileDir(in, out);
       }
     } catch (ParseException ex) {
