@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * The josetta checker
  *
  * @author gianpiero.di.blasi
  */
