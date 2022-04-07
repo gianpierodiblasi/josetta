@@ -32,7 +32,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
   - generics are not covered
-  - enum are not covered
+  - enums are not covered
   - constructor overloading is not covered
   - method overloading is not covered
   - parameters and methods cannot have the same name
