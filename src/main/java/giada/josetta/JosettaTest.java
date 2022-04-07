@@ -12,7 +12,7 @@ public class JosettaTest {
       "-in",
       "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\src\\",
       "-out",
-      "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\src\\",
+      "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\build\\js\\",
       "-w"
     });
   }

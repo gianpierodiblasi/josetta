@@ -5,9 +5,12 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import org.apache.commons.cli.CommandLine;
@@ -66,8 +69,8 @@ public class Josetta {
       for (File child : in.listFiles()) {
         Josetta.transpileDir(child, new File(out, child.getName()));
       }
-    } else if (in.isFile() && in.getName().toLowerCase().endsWith(".java")) {
-      out = new File(out.getParentFile(), out.getName().toLowerCase().replace(".java", ".js"));
+    } else if (in.isFile() && in.getName().endsWith(".java")) {
+      out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
       System.out.println("transpiling " + in + " into " + out);
       Josetta.transpile(in, out);
     }
@@ -76,15 +79,62 @@ public class Josetta {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static void watch(File in, File out) throws Exception {
     System.out.println("watching " + in);
-    WatchService watchService = FileSystems.getDefault().newWatchService();
-    in.toPath().register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
-    WatchKey watchKey;
-    while ((watchKey = watchService.take()) != null) {
+    Path inPath = in.toPath();
+    Path outPath = out.toPath();
+
+    WatchService watchService = FileSystems.getDefault().newWatchService();
+    inPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+    while (true) {
+      WatchKey watchKey = watchService.take();
+
       watchKey.pollEvents().forEach(event -> {
-        System.out.println("Event kind:" + event.kind() + ". File affected: " + event.context() + ".");
+        Kind<?> kind = event.kind();
+        File inFile = inPath.resolve((Path) event.context()).toFile();
+        File outFile = outPath.resolve((Path) event.context()).toFile();
+
+        if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+          if (inFile.isDirectory()) {
+            System.out.println("creating folder " + outFile);
+            outFile.mkdirs();
+          } else if (inFile.isFile() && inFile.getName().endsWith(".java")) {
+            outFile = new File(outFile.getParentFile(), inFile.getName().replace(".java", ".js"));
+            try {
+              Josetta.transpile(inFile, outFile);
+            } catch (Exception ex) {
+              System.out.println(ex.getMessage());
+            }
+          }
+        } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+          if (inFile.isDirectory()) {
+          } else if (inFile.isFile()) {
+          }
+        } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+          System.out.println("deleting file/folder " + outFile);
+          Josetta.delete(outFile);
+        }
       });
+
       watchKey.reset();
+    }
+  }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void delete(File file) {
+    try {
+      if (!file.exists()) {
+        return;
+      }
+
+      if (file.isDirectory()) {
+        for (File f : file.listFiles()) {
+          Josetta.delete(f);
+        }
+      }
+      Files.delete(file.toPath());
+    } catch (IOException ex) {
+      System.out.println(ex.getMessage());
     }
   }
 
