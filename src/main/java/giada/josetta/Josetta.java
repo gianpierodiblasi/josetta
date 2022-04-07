@@ -78,7 +78,7 @@ public class Josetta {
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   private static void watch(File in, File out) throws Exception {
-    System.out.println("watching " + in);
+    System.out.println("watching " + in + " into " + out);
 
     Path inPath = in.toPath();
     Path outPath = out.toPath();
@@ -98,25 +98,43 @@ public class Josetta {
           if (inFile.isDirectory()) {
             System.out.println("creating folder " + outFile);
             outFile.mkdirs();
-          } else if (inFile.isFile() && inFile.getName().endsWith(".java")) {
-            outFile = new File(outFile.getParentFile(), inFile.getName().replace(".java", ".js"));
-            try {
-              Josetta.transpile(inFile, outFile);
-            } catch (Exception ex) {
-              System.out.println(ex.getMessage());
-            }
+          } else {
+            Josetta.transpileInWatch(inFile, outFile);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
           if (inFile.isDirectory()) {
-          } else if (inFile.isFile()) {
+          } else {
+            Josetta.transpileInWatch(inFile, outFile);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-          System.out.println("deleting file/folder " + outFile);
-          Josetta.delete(outFile);
+          if (outFile.isDirectory()) {
+            System.out.println("deleting folder " + outFile);
+            Josetta.delete(outFile);
+          }
+
+          outFile = new File(outFile.getParentFile(), outFile.getName().replace(".java", ".js"));
+          if (outFile.isFile()) {
+            System.out.println("deleting file " + outFile);
+            Josetta.delete(outFile);
+          }
         }
       });
 
       watchKey.reset();
+    }
+  }
+
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  private static void transpileInWatch(File inFile, File outFile) {
+    if (inFile.isFile() && inFile.getName().endsWith(".java")) {
+      outFile = new File(outFile.getParentFile(), outFile.getName().replace(".java", ".js"));
+
+      try {
+        System.out.println("transpiling " + inFile + " into " + outFile);
+        Josetta.transpile(inFile, outFile);
+      } catch (Exception ex) {
+        System.out.println(ex.getMessage());
+      }
     }
   }
 
