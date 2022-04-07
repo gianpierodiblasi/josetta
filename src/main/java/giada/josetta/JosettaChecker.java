@@ -4,6 +4,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -34,6 +35,7 @@ public class JosettaChecker {
    */
   public static void checkCompilationUnit(CompilationUnit compilationUnit) {
     compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface));
+    compilationUnit.findAll(EnumDeclaration.class).forEach(enumDeclaration -> JosettaChecker.checkEnumDeclaration(enumDeclaration));
     compilationUnit.findAll(ConstructorDeclaration.class).forEach(constructor -> JosettaChecker.checkConstructor(constructor));
     compilationUnit.findAll(FieldDeclaration.class).forEach(field -> JosettaChecker.checkField(field));
     compilationUnit.findAll(MethodDeclaration.class).forEach(method -> JosettaChecker.checkMethod(method));
@@ -73,6 +75,10 @@ public class JosettaChecker {
 
     Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface);
     JosettaChecker.checkFields(classOrInterface, map);
+  }
+
+  private static void checkEnumDeclaration(EnumDeclaration enumDeclaration) {
+    throw new RuntimeException(enumDeclaration.getNameAsString() + " is an enum. NOT COVERED.");
   }
 
   private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface) {
