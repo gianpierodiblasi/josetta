@@ -4,7 +4,7 @@
   
   <groupId>giada</groupId>
   <artifactId>josetta</artifactId>
-  <version>1.0</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   
   <name>josetta</name>
@@ -29,7 +29,7 @@
   </dependencies>
   
   <build>
-    <finalName>${project.artifactId}</finalName>
+    <finalName>${project.artifactId}-${project.version}</finalName>
     <directory>${user.home}/builds/${project.artifactId}</directory>
     
     <plugins>
