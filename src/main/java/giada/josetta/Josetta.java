@@ -7,12 +7,17 @@ import com.github.javaparser.ast.ImportDeclaration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -82,40 +87,59 @@ public class Josetta {
 
     Path inPath = in.toPath();
     Path outPath = out.toPath();
+    Map<WatchKey, Path> map = new HashMap<>();
 
     WatchService watchService = FileSystems.getDefault().newWatchService();
-    inPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+    map.put(inPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE), inPath);
+
+    Files.walkFileTree(inPath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs) throws IOException {
+        map.put(path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE), path);
+        return FileVisitResult.CONTINUE;
+      }
+    });
 
     while (true) {
       WatchKey watchKey = watchService.take();
 
       watchKey.pollEvents().forEach(event -> {
         Kind<?> kind = event.kind();
-        File inFile = inPath.resolve((Path) event.context()).toFile();
-        File outFile = outPath.resolve((Path) event.context()).toFile();
+        Path mapPath = map.get(watchKey);
+        Path path = (Path) event.context();
+
+        Path inEventPath = mapPath.resolve(path);
+        Path outEventPath = outPath.resolve(inPath.relativize(mapPath)).resolve(path);
+        File inEventFile = inEventPath.toFile();
+        File outEventFile = outEventPath.toFile();
 
         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-          if (inFile.isDirectory()) {
-            System.out.println("creating folder " + outFile);
-            outFile.mkdirs();
+          if (inEventFile.isDirectory()) {
+            System.out.println("creating folder " + outEventFile);
+            outEventFile.mkdirs();
+
+            try {
+              outEventPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            } catch (IOException ex) {
+              throw new RuntimeException(ex.getMessage(), ex);
+            }
           } else {
-            Josetta.transpileInWatch(inFile, outFile);
+            Josetta.transpileInWatch(inEventFile, outEventFile);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-          if (inFile.isDirectory()) {
-          } else {
-            Josetta.transpileInWatch(inFile, outFile);
+          if (inEventFile.isFile()) {
+            Josetta.transpileInWatch(inEventFile, outEventFile);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-          if (outFile.isDirectory()) {
-            System.out.println("deleting folder " + outFile);
-            Josetta.delete(outFile);
+          if (outEventFile.isDirectory()) {
+            System.out.println("deleting folder " + outEventFile);
+            Josetta.delete(outEventFile);
           }
 
-          outFile = new File(outFile.getParentFile(), outFile.getName().replace(".java", ".js"));
-          if (outFile.isFile()) {
-            System.out.println("deleting file " + outFile);
-            Josetta.delete(outFile);
+          outEventFile = new File(outEventFile.getParentFile(), outEventFile.getName().replace(".java", ".js"));
+          if (outEventFile.isFile()) {
+            System.out.println("deleting file " + outEventFile);
+            Josetta.delete(outEventFile);
           }
         }
       });
