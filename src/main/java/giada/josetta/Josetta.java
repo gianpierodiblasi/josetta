@@ -41,6 +41,8 @@ public class Josetta {
   public static void transpile(File in, File out) throws Exception {
     String javaCode = Files.readString(in.toPath());
     String esCode = Josetta.transpile(javaCode);
+
+    out.getParentFile().mkdirs();
     Files.writeString(out.toPath(), esCode);
   }
 
@@ -158,6 +160,7 @@ public class Josetta {
         Josetta.transpile(inFile, outFile);
       } catch (Exception ex) {
         System.out.println(ex.getMessage());
+        ex.printStackTrace();
       }
     }
   }
@@ -177,6 +180,7 @@ public class Josetta {
       Files.delete(file.toPath());
     } catch (IOException ex) {
       System.out.println(ex.getMessage());
+      ex.printStackTrace();
     }
   }
 
@@ -202,6 +206,7 @@ public class Josetta {
       new HelpFormatter().printHelp("Options info", options);
     } catch (Exception ex) {
       System.out.println(ex.getMessage());
+      ex.printStackTrace();
     }
   }
 }
