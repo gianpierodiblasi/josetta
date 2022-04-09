@@ -43,7 +43,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - in general standard DOM and JS objects can be "simulated" by using
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   - any JS external library can be "simulated" (if available) by using
-    [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/)
+    [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
 
 ## Dependencies
 - JavaParser - [link](https://javaparser.org/)
