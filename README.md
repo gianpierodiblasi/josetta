@@ -32,7 +32,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - limitations
   - packages are not covered, so (for example) two classes with the same name in different packages are not covered
     (the second transpiled class will replace the first one)
-  - interfaces and abstract classes (public, protected, private and friendly) are converted to class (empty methods are appropriately managed)
+  - interfaces and abstract classes (public, protected, private and friendly) are converted into class (empty methods are appropriately managed)
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
   - enums are not covered
@@ -40,13 +40,14 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - method overloading is not covered
   - parameters and methods cannot have the same name
   - parameters declarations can contain only one variable declaration for each row
-  - all Java objects in all Java packages (Object, String, Math, etc.) are not covered
+  - all Java objects in all Java packages (Object, Math, etc.) are not covered
   - collections (array, list, map, tree, etc.) are not covered, as an alternative the Array object in
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/) can be used
   - in general standard DOM and JS objects can be "simulated" by using
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   - any JS external library can be "simulated" (if available) by using
     [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
+    (for example by means of the ***$*** features described above)
 
 ## Dependencies
 - JavaParser - [link](https://javaparser.org/)
