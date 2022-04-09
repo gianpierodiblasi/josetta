@@ -32,7 +32,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - limitations
   - packages are not covered, so (for example) two classes with the same name in different packages are not covered
     (the second transpiled class will replace the first one)
-  - interfaces and classes are covered (public, protected, private and friendly), interfaces are converted to class
+  - interfaces and abstract classes (public, protected, private and friendly) are converted to class (empty methods are appropriately managed)
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
   - enums are not covered
