@@ -46,7 +46,7 @@ public class JosettaChecker {
   }
 
   private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface) {
-    if (classOrInterface.isInnerClass()) {
+    if (classOrInterface.isInnerClass() && !classOrInterface.getNameAsString().startsWith("$")) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " is an inner class. NOT COVERED.");
     }
 
@@ -83,7 +83,7 @@ public class JosettaChecker {
   }
 
   private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface) {
-    Map<String, Long> map = classOrInterface.getMethods().stream().collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
+    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !method.getNameAsString().startsWith("$")).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
     if (map.values().stream().anyMatch(value -> value > 1)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some overloaded methods");
     }
@@ -115,7 +115,7 @@ public class JosettaChecker {
     if (field.getVariables().size() > 1) {
       throw new RuntimeException("Field declaration " + field + " has more than one variable in a single row");
     }
-    
+
     field.getVariables().forEach(variable -> JosettaChecker.checkVariableDeclarator(variable));
 
     field.setAllTypes(new UnknownType());

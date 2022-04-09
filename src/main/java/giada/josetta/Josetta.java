@@ -40,7 +40,7 @@ public class Josetta {
    */
   public static void transpile(File in, File out) throws Exception {
     String javaCode = Files.readString(in.toPath());
-    String esCode = Josetta.transpile(javaCode);
+    String esCode = Josetta.transpile(javaCode).replaceAll("\\R{3,}+", "\n");
 
     out.getParentFile().mkdirs();
     Files.writeString(out.toPath(), esCode);

@@ -6,14 +6,19 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithExpression;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -80,6 +85,47 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(EnumDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(final ClassOrInterfaceDeclaration n, final Void arg) {
+    if (!n.getNameAsString().startsWith("$")) {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  public void visit(final ObjectCreationExpr n, final Void arg) {
+    String name = n.getType().getName().asString();
+    if (name.startsWith("$")) {
+      n.getType().setName(name.substring(1));
+    }
+    super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(final MethodDeclaration n, final Void arg) {
+    if (!n.getNameAsString().startsWith("$")) {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  public void visit(MethodReferenceExpr n, Void arg) {
+    String identifier = n.getIdentifier();
+    if (identifier != null && identifier.startsWith("$")) {
+      n.setIdentifier(identifier.substring(1));
+    }
+    super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(final MethodCallExpr n, final Void arg) {
+    String name = n.getName().asString();
+    if (name.startsWith("$")) {
+      n.setName(name.substring(1));
+    }
+    super.visit(n, arg);
   }
 
   @Override

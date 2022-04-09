@@ -20,6 +20,8 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - first golden rule, write Java code as if you are writing ES6 code
   - always use the "this." prefix to reference a parameter or a method
   - always use the "ClassName." prefix to reference a static parameter or a static method
+  - if you want create a class or a method but you don't want the class/method to be transpiled then prefix its name with *$* symbol;
+    in the transpilation phase the class/method *$*<class/method-name> will be replaced with <class/method-name>
 - covered features
   - class constructors (public, protected, private and friendly)
   - class (static) parameters (public, protected, private and friendly)
