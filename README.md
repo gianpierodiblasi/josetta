@@ -23,14 +23,15 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with ***$*** symbol;
     in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name>
 - covered features
-  - imports are covered (they are omitted)
-  - generics are covered (they are omitted)
+  - imports (they are omitted)
+  - generics (they are omitted)
   - class constructors (public, protected, private and friendly)
   - class (static) parameters (public, protected, private and friendly)
   - class (static) methods (public, protected, private and friendly)
   - primitive types are covered
 - limitations
   - packages are not covered, so (for example) two classes with the same name in different packages are not covered
+    (the second transpiled class will replace the first one)
   - interfaces and classes are covered (public, protected, private and friendly), interfaces are converted to class
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
@@ -40,7 +41,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - parameters and methods cannot have the same name
   - parameters declarations can contain only one variable declaration for each row
   - all Java objects in all Java packages (Object, String, Math, etc.) are not covered
-  - collections (array, list, map, tree, etc.) are not covered, as an alternative the Array oject in
+  - collections (array, list, map, tree, etc.) are not covered, as an alternative the Array object in
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/) can be used
   - in general standard DOM and JS objects can be "simulated" by using
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
