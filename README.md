@@ -28,7 +28,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - class constructors (public, protected, private and friendly)
   - class (static) parameters (public, protected, private and friendly)
   - class (static) methods (public, protected, private and friendly)
-  - primitive types are covered
+  - primitive types (byte, short, int, long, float, double, boolean) and String type (with some limitations)
 - limitations
   - packages are not covered, so (for example) two classes with the same name in different packages are not covered
     (the second transpiled class will replace the first one)
