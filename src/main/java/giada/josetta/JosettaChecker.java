@@ -73,7 +73,7 @@ public class JosettaChecker {
     classOrInterface.setPublic(false);
     classOrInterface.setStatic(false);
     classOrInterface.setTypeParameters(new NodeList<>());
-
+    
     Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface);
     JosettaChecker.checkFields(classOrInterface, map);
   }

@@ -23,6 +23,7 @@ import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithExpression;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.configuration.ConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
@@ -92,6 +93,19 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     if (!n.getNameAsString().startsWith("$")) {
       super.visit(n, arg);
     }
+  }
+
+  @Override
+  public void visit(final ClassOrInterfaceType n, final Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+    if (n.getScope().isPresent()) {
+      n.getScope().get().accept(this, arg);
+      printer.print(".");
+    }
+    printAnnotations(n.getAnnotations(), false, arg);
+
+    n.getName().accept(this, arg);
   }
 
   @Override

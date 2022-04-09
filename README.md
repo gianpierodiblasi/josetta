@@ -23,17 +23,17 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with ***$*** symbol;
     in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name>
 - covered features
+  - imports are covered (they are omitted)
+  - generics are covered (they are omitted)
   - class constructors (public, protected, private and friendly)
   - class (static) parameters (public, protected, private and friendly)
   - class (static) methods (public, protected, private and friendly)
   - primitive types are covered
 - limitations
   - packages are not covered, so (for example) two classes with the same name in different packages are not covered
-  - imports are covered (they are omitted)
   - interfaces and classes are covered (public, protected, private and friendly), interfaces are converted to class
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
-  - generics are not covered
   - enums are not covered
   - constructor overloading is not covered
   - method overloading is not covered
