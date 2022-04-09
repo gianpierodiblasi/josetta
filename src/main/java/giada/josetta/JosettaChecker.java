@@ -112,6 +112,10 @@ public class JosettaChecker {
   }
 
   private static void checkField(FieldDeclaration field) {
+    if (field.getVariables().size() > 1) {
+      throw new RuntimeException("Field declaration " + field + " has more than one variable in a single row");
+    }
+    
     field.getVariables().forEach(variable -> JosettaChecker.checkVariableDeclarator(variable));
 
     field.setAllTypes(new UnknownType());

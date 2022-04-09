@@ -36,6 +36,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - constructor overloading is not covered
   - method overloading is not covered
   - parameters and methods cannot have the same name
+  - parameters declarations can contain only one variable declaration for each row
   - all Java objects in all Java packages (Object, String, Math, etc.) are not covered
   - collections (array, list, map, tree, etc.) are not covered, as an alternative the Array oject in
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/) can be used
