@@ -42,6 +42,7 @@ import java.util.Optional;
  */
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
+  private String[] ag, as, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -54,6 +55,10 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
    */
   public JosettaPrinterVisitor(String[] ag, String[] as, String[] nt) {
     super(new DefaultPrinterConfiguration().addOption(JosettaPrinterVisitor.INDENTATION_OPTION));
+
+    this.ag = ag;
+    this.as = as;
+    this.nt = nt;
   }
 
 //  @Override

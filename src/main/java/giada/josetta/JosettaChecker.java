@@ -49,11 +49,7 @@ public class JosettaChecker {
   }
 
   private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] nt) {
-    boolean b = true;
-    for (String str : nt) {
-      b &= !classOrInterface.getNameAsString().startsWith(str);
-    }
-    if (classOrInterface.isInnerClass() && b) {
+    if (classOrInterface.isInnerClass() && !startsWith(classOrInterface.getNameAsString(), nt)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " is an inner class. NOT COVERED.");
     }
 
@@ -90,13 +86,7 @@ public class JosettaChecker {
   }
 
   private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] nt) {
-    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> {
-      boolean b = true;
-      for (String str : nt) {
-        b &= !method.getNameAsString().startsWith(str);
-      }
-      return b;
-    }).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
+    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt)).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
 
     if (map.values().stream().anyMatch(value -> value > 1)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some overloaded methods");
@@ -207,6 +197,15 @@ public class JosettaChecker {
     variable.setFinal(false);
     variable.setModifiers(new NodeList<>());
     variable.setAllTypes(new ClassOrInterfaceType(null, "let"));
+  }
+
+  private static boolean startsWith(String string, String strs[]) {
+    for (String str : strs) {
+      if (string.startsWith(str)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private JosettaChecker() {
