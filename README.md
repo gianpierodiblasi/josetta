@@ -47,7 +47,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
     [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
     (for example by means of the ***$*** features described above)
 
-### Special Use Case
+### Special Use Cases
 - if you are using the Array object available in [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   or if you are simulating arrays by means of your own class, then you can use the special methods $get/$set to get/set the array values.
   For example the following code snippet:

@@ -36,8 +36,8 @@ public class Josetta {
    *
    * @param in The input file
    * @param out The output file
-   * @param ag The list of array setter methods
-   * @param as The list of array getter methods
+   * @param ag The list of array getter methods
+   * @param as The list of array setter methods
    * @param nt The list of no transpilation symbols
    * @throws Exception thrown if an error occurs
    */
@@ -53,8 +53,8 @@ public class Josetta {
    * Transpiles a Java code into ES6 code
    *
    * @param javaCode The java code
-   * @param ag The list of array setter methods
-   * @param as The list of array getter methods
+   * @param ag The list of array getter methods
+   * @param as The list of array setter methods
    * @param nt The list of no transpilation symbols
    * @return The ES6 code
    * @throws Exception thrown if an error occurs

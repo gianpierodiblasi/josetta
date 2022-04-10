@@ -49,8 +49,8 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   /**
    * Creates a printer visitor
    *
-   * @param ag The list of array setter methods
-   * @param as The list of array getter methods
+   * @param ag The list of array getter methods
+   * @param as The list of array setter methods
    * @param nt The list of no transpilation symbols
    */
   public JosettaPrinterVisitor(String[] ag, String[] as, String[] nt) {

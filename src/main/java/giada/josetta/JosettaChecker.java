@@ -33,12 +33,12 @@ public class JosettaChecker {
    * Checks a compilation unit
    *
    * @param compilationUnit The compilation unit
-   * @param ag The list of array setter methods
-   * @param as The list of array getter methods
+   * @param ag The list of array getter methods
+   * @param as The list of array setter methods
    * @param nt The list of no transpilation symbols
    */
   public static void checkCompilationUnit(CompilationUnit compilationUnit, String[] ag, String[] as, String[] nt) {
-    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, nt));
+    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, ag, as, nt));
     compilationUnit.findAll(EnumDeclaration.class).forEach(enumDeclaration -> JosettaChecker.checkEnumDeclaration(enumDeclaration));
     compilationUnit.findAll(ConstructorDeclaration.class).forEach(constructor -> JosettaChecker.checkConstructor(constructor));
     compilationUnit.findAll(FieldDeclaration.class).forEach(field -> JosettaChecker.checkField(field));
@@ -48,7 +48,7 @@ public class JosettaChecker {
     compilationUnit.findAll(VariableDeclarationExpr.class).forEach(variable -> JosettaChecker.checkVariableDeclarationExpr(variable));
   }
 
-  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] nt) {
+  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] nt) {
     if (classOrInterface.isInnerClass() && !startsWith(classOrInterface.getNameAsString(), nt)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " is an inner class. NOT COVERED.");
     }
@@ -77,16 +77,12 @@ public class JosettaChecker {
     classOrInterface.setStatic(false);
     classOrInterface.setTypeParameters(new NodeList<>());
 
-    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, nt);
+    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, ag, as, nt);
     JosettaChecker.checkFields(classOrInterface, map);
   }
 
-  private static void checkEnumDeclaration(EnumDeclaration enumDeclaration) {
-    throw new RuntimeException(enumDeclaration.getNameAsString() + " is an enum. NOT COVERED.");
-  }
-
-  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] nt) {
-    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt)).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
+  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] nt) {
+    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt) && !isGetterOrSetter(method.getNameAsString(), ag, as)).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
 
     if (map.values().stream().anyMatch(value -> value > 1)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some overloaded methods");
@@ -100,6 +96,10 @@ public class JosettaChecker {
     if (fieldAndMethodWithSameName) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some fields and methods with the same name");
     }
+  }
+
+  private static void checkEnumDeclaration(EnumDeclaration enumDeclaration) {
+    throw new RuntimeException(enumDeclaration.getNameAsString() + " is an enum. NOT COVERED.");
   }
 
   private static void checkConstructor(ConstructorDeclaration constructor) {
@@ -202,6 +202,20 @@ public class JosettaChecker {
   private static boolean startsWith(String string, String strs[]) {
     for (String str : strs) {
       if (string.startsWith(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean isGetterOrSetter(String string, String strs1[], String[] strs2) {
+    for (String str : strs1) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    for (String str : strs2) {
+      if (string.equals(str)) {
         return true;
       }
     }
