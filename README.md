@@ -82,7 +82,7 @@ In order to perform a build you can use maven CLI or any IDE compatible with mav
 ## Run
 josetta can be embedded in your Java project or can be used by its CLI. The following is an example how to run josetta by command line:
 ```
-java -jar <josetta-jar> -in <in> -out <out> -w
+java -jar <josetta-jar> -in <in> -out <out> -w -ag <array-getter-methods> -as <array-setter-methods> -nt <no-transpilation-symbols>
 ```
 The following table explains the parameters
 
@@ -93,7 +93,7 @@ The following table explains the parameters
 | w   | if available josetta will indefinitely watch for files changes in the input folder and automatically transpile the files | false | no default value |
 | ag  | array getter methods, as a string of comma separated values | false | "$get" |
 | as  | array setter methods, as a string of comma separated values | false | "$set" | 
-| nts | no transpilation symbol, as a string of comma separated values | false | "$" |
+| nt | no transpilation symbols, as a string of comma separated values | false | "$" |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
