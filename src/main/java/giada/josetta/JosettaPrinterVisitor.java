@@ -154,7 +154,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     if (isGetter(name)) {
       this.visit(new ArrayAccessExpr(n.getNameAsExpression(), n.getArguments().get(0)), arg);
     } else if (isSetter(name)) {
-
+//TODO
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
