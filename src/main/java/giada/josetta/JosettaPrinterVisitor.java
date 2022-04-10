@@ -61,202 +61,215 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     this.nt = nt;
   }
 
-//  @Override
-//  public void visit(PackageDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(ImportDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(NormalAnnotationExpr n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(SingleMemberAnnotationExpr n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(MarkerAnnotationExpr n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(AnnotationMemberDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(AnnotationDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(EnumConstantDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(EnumDeclaration n, Void arg) {
-//  }
-//
-//  @Override
-//  public void visit(final ClassOrInterfaceDeclaration n, final Void arg) {
-//    if (!n.getNameAsString().matches("^\\$.*\\$$")) {
-//      super.visit(n, arg);
-//    }
-//  }
-//
-//  @Override
-//  public void visit(final ClassOrInterfaceType n, final Void arg) {
-//    printOrphanCommentsBeforeThisChildNode(n);
-//    printComment(n.getComment(), arg);
-//    if (n.getScope().isPresent()) {
-//      n.getScope().get().accept(this, arg);
-//      printer.print(".");
-//    }
-//    printAnnotations(n.getAnnotations(), false, arg);
-//
-//    n.getName().accept(this, arg);
-//  }
-//
-//  @Override
-//  public void visit(final ObjectCreationExpr n, final Void arg) {
-//    String name = n.getType().getName().asString();
-//    if (name.matches("^\\$.*\\$$")) {
-//      n.getType().setName(name.substring(1, name.length() - 1));
-//    }
-//    super.visit(n, arg);
-//  }
-//
-//  @Override
-//  public void visit(final MethodDeclaration n, final Void arg) {
-//    if (!n.getNameAsString().matches("^\\$.*\\$$")) {
-//      super.visit(n, arg);
-//    }
-//  }
-//
-//  @Override
-//  public void visit(MethodReferenceExpr n, Void arg) {
-//    String identifier = n.getIdentifier();
-//    if (identifier != null && identifier.matches("^\\$.*\\$$")) {
-//      n.setIdentifier(identifier.substring(1, identifier.length() - 1));
-//    }
-//    super.visit(n, arg);
-//  }
-//
-//  @Override
-//  public void visit(final MethodCallExpr n, final Void arg) {
-//    String name = n.getName().asString();
-//    if (name.equals("$get")) {
-//
-//    } else if (name.equals("$set")) {
-//
-//    } else if (name.matches("^\\$.*\\$$")) {
-//      n.setName(name.substring(1, name.length() - 1));
-//      super.visit(n, arg);
-//    } else {
-//      super.visit(n, arg);
-//    }
-//
-//  }
-//
-//  @Override
-//  public void visit(BinaryExpr n, Void arg) {
-//    printOrphanCommentsBeforeThisChildNode(n);
-//    printComment(n.getComment(), arg);
-//    n.getLeft().accept(this, arg);
-//    if (getOption(DefaultPrinterConfiguration.ConfigOption.SPACE_AROUND_OPERATORS).isPresent()) {
-//      printer.print(" ");
-//    }
-//
-//    printer.print(n.getOperator().asString());
-//    switch (n.getOperator()) {
-//      case EQUALS:
-//      case NOT_EQUALS:
-//        printer.print("=");
-//        break;
-//    }
-//
-//    if (getOption(DefaultPrinterConfiguration.ConfigOption.SPACE_AROUND_OPERATORS).isPresent()) {
-//      printer.print(" ");
-//    }
-//    n.getRight().accept(this, arg);
-//  }
-//
-//  @Override
-//  @SuppressWarnings({"unchecked", "null"})
-//  public void visit(LambdaExpr n, Void arg) {
-//    printOrphanCommentsBeforeThisChildNode(n);
-//    printComment(n.getComment(), arg);
-//
-//    final NodeList<Parameter> parameters = n.getParameters();
-//    final boolean printPar = n.isEnclosingParameters();
-//
-//    if (printPar) {
-//      printer.print("(");
-//    }
-//    for (Iterator<Parameter> i = parameters.iterator(); i.hasNext();) {
-//      Parameter p = i.next();
-//      p.accept(this, arg);
-//      if (i.hasNext()) {
-//        printer.print(", ");
-//      }
-//    }
-//    if (printPar) {
-//      printer.print(")");
-//    }
-//
-//    printer.print(" => ");
-//    final Statement body = n.getBody();
-//    if (body instanceof ExpressionStmt) {
-//      // Print the expression directly
-//      ((NodeWithExpression<ExpressionStmt>) body).getExpression().accept(this, arg);
-//    } else {
-//      body.accept(this, arg);
-//    }
-//  }
-//
-//  @SuppressWarnings("null")
-//  private void printOrphanCommentsBeforeThisChildNode(final Node node) {
-//    if (!getOption(DefaultPrinterConfiguration.ConfigOption.PRINT_COMMENTS).isPresent()) {
-//      return;
-//    }
-//    if (node instanceof Comment) {
-//      return;
-//    }
-//
-//    Node parent = node.getParentNode().orElse(null);
-//    if (parent == null) {
-//      return;
-//    }
-//    List<Node> everything = new ArrayList<>(parent.getChildNodes());
-//    sortByBeginPosition(everything);
-//    int positionOfTheChild = -1;
-//    for (int i = 0; i < everything.size(); ++i) { // indexOf is by equality, so this is used to index by identity
-//      if (everything.get(i) == node) {
-//        positionOfTheChild = i;
-//        break;
-//      }
-//    }
-//    if (positionOfTheChild == -1) {
-//      throw new AssertionError("I am not a child of my parent.");
-//    }
-//    int positionOfPreviousChild = -1;
-//    for (int i = positionOfTheChild - 1; i >= 0 && positionOfPreviousChild == -1; i--) {
-//      if (!(everything.get(i) instanceof Comment)) {
-//        positionOfPreviousChild = i;
-//      }
-//    }
-//    for (int i = positionOfPreviousChild + 1; i < positionOfTheChild; i++) {
-//      Node nodeToPrint = everything.get(i);
-//      if (!(nodeToPrint instanceof Comment)) {
-//        throw new RuntimeException(
-//                "Expected comment, instead " + nodeToPrint.getClass() + ". Position of previous child: "
-//                + positionOfPreviousChild + ", position of child " + positionOfTheChild);
-//      }
-//      nodeToPrint.accept(this, null);
-//    }
-//  }
-//
-//  private Optional<ConfigurationOption> getOption(DefaultPrinterConfiguration.ConfigOption cOption) {
-//    return configuration.get(new DefaultConfigurationOption(cOption));
-//  }
+  @Override
+  public void visit(PackageDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(ImportDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(NormalAnnotationExpr n, Void arg) {
+  }
+
+  @Override
+  public void visit(SingleMemberAnnotationExpr n, Void arg) {
+  }
+
+  @Override
+  public void visit(MarkerAnnotationExpr n, Void arg) {
+  }
+
+  @Override
+  public void visit(AnnotationMemberDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(AnnotationDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(EnumConstantDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(EnumDeclaration n, Void arg) {
+  }
+
+  @Override
+  public void visit(final ClassOrInterfaceDeclaration n, final Void arg) {
+    if (startsWith(n.getNameAsString(), nt) == 0) {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  public void visit(final ClassOrInterfaceType n, final Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+    if (n.getScope().isPresent()) {
+      n.getScope().get().accept(this, arg);
+      printer.print(".");
+    }
+    printAnnotations(n.getAnnotations(), false, arg);
+
+    n.getName().accept(this, arg);
+  }
+
+  @Override
+  public void visit(final ObjectCreationExpr n, final Void arg) {
+    String name = n.getType().getName().asString();
+    int startsWith = startsWith(name, nt);
+    if (startsWith != 0) {
+      n.getType().setName(name.substring(startsWith));
+    }
+    super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(final MethodDeclaration n, final Void arg) {
+    if (startsWith(n.getNameAsString(), nt) == 0) {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("null")
+  public void visit(MethodReferenceExpr n, Void arg) {
+    String identifier = n.getIdentifier();
+    int startsWith = identifier != null ? startsWith(identifier, nt) : 0;
+    if (startsWith != 0) {
+      n.setIdentifier(identifier.substring(startsWith));
+    }
+    super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(final MethodCallExpr n, final Void arg) {
+    String name = n.getName().asString();
+    int startsWith = startsWith(name, nt);
+    
+    if (name.equals("$get")) {
+
+    } else if (name.equals("$set")) {
+
+    } else if (startsWith != 0) {
+      n.setName(name.substring(startsWith));
+      super.visit(n, arg);
+    } else {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  public void visit(BinaryExpr n, Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+    n.getLeft().accept(this, arg);
+    if (getOption(DefaultPrinterConfiguration.ConfigOption.SPACE_AROUND_OPERATORS).isPresent()) {
+      printer.print(" ");
+    }
+
+    printer.print(n.getOperator().asString());
+    switch (n.getOperator()) {
+      case EQUALS:
+      case NOT_EQUALS:
+        printer.print("=");
+        break;
+    }
+
+    if (getOption(DefaultPrinterConfiguration.ConfigOption.SPACE_AROUND_OPERATORS).isPresent()) {
+      printer.print(" ");
+    }
+    n.getRight().accept(this, arg);
+  }
+
+  @Override
+  @SuppressWarnings({"unchecked", "null"})
+  public void visit(LambdaExpr n, Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+
+    final NodeList<Parameter> parameters = n.getParameters();
+    final boolean printPar = n.isEnclosingParameters();
+
+    if (printPar) {
+      printer.print("(");
+    }
+    for (Iterator<Parameter> i = parameters.iterator(); i.hasNext();) {
+      Parameter p = i.next();
+      p.accept(this, arg);
+      if (i.hasNext()) {
+        printer.print(", ");
+      }
+    }
+    if (printPar) {
+      printer.print(")");
+    }
+
+    printer.print(" => ");
+    final Statement body = n.getBody();
+    if (body instanceof ExpressionStmt) {
+      // Print the expression directly
+      ((NodeWithExpression<ExpressionStmt>) body).getExpression().accept(this, arg);
+    } else {
+      body.accept(this, arg);
+    }
+  }
+
+  @SuppressWarnings("null")
+  private void printOrphanCommentsBeforeThisChildNode(final Node node) {
+    if (!getOption(DefaultPrinterConfiguration.ConfigOption.PRINT_COMMENTS).isPresent()) {
+      return;
+    }
+    if (node instanceof Comment) {
+      return;
+    }
+
+    Node parent = node.getParentNode().orElse(null);
+    if (parent == null) {
+      return;
+    }
+    List<Node> everything = new ArrayList<>(parent.getChildNodes());
+    sortByBeginPosition(everything);
+    int positionOfTheChild = -1;
+    for (int i = 0; i < everything.size(); ++i) { // indexOf is by equality, so this is used to index by identity
+      if (everything.get(i) == node) {
+        positionOfTheChild = i;
+        break;
+      }
+    }
+    if (positionOfTheChild == -1) {
+      throw new AssertionError("I am not a child of my parent.");
+    }
+    int positionOfPreviousChild = -1;
+    for (int i = positionOfTheChild - 1; i >= 0 && positionOfPreviousChild == -1; i--) {
+      if (!(everything.get(i) instanceof Comment)) {
+        positionOfPreviousChild = i;
+      }
+    }
+    for (int i = positionOfPreviousChild + 1; i < positionOfTheChild; i++) {
+      Node nodeToPrint = everything.get(i);
+      if (!(nodeToPrint instanceof Comment)) {
+        throw new RuntimeException(
+                "Expected comment, instead " + nodeToPrint.getClass() + ". Position of previous child: "
+                + positionOfPreviousChild + ", position of child " + positionOfTheChild);
+      }
+      nodeToPrint.accept(this, null);
+    }
+  }
+
+  private Optional<ConfigurationOption> getOption(DefaultPrinterConfiguration.ConfigOption cOption) {
+    return configuration.get(new DefaultConfigurationOption(cOption));
+  }
+
+  private int startsWith(String string, String strs[]) {
+    for (String str : strs) {
+      if (string.startsWith(str)) {
+        return str.length();
+      }
+    }
+    return 0;
+  }
 }
