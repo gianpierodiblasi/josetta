@@ -45,7 +45,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   - any JS external library can be "simulated" (if available) by using
     [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
-    (for example by means of the ***$*** features described above)
+    (for example by means of the ***$*** features described below)
 
 ### Special Use Cases
 - if you are using the Array object available in [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
