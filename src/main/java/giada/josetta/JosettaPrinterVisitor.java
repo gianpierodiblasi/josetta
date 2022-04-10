@@ -12,6 +12,7 @@ import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
@@ -42,7 +43,7 @@ import java.util.Optional;
  */
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
-  private String[] ag, as, nt;
+  private final String[] ag, as, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -99,7 +100,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(final ClassOrInterfaceDeclaration n, final Void arg) {
-    if (startsWith(n.getNameAsString(), nt) == 0) {
+    if (startsWith(n.getNameAsString()) == 0) {
       super.visit(n, arg);
     }
   }
@@ -120,7 +121,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   @Override
   public void visit(final ObjectCreationExpr n, final Void arg) {
     String name = n.getType().getName().asString();
-    int startsWith = startsWith(name, nt);
+    int startsWith = startsWith(name);
     if (startsWith != 0) {
       n.getType().setName(name.substring(startsWith));
     }
@@ -129,7 +130,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(final MethodDeclaration n, final Void arg) {
-    if (startsWith(n.getNameAsString(), nt) == 0) {
+    if (startsWith(n.getNameAsString()) == 0) {
       super.visit(n, arg);
     }
   }
@@ -138,7 +139,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   @SuppressWarnings("null")
   public void visit(MethodReferenceExpr n, Void arg) {
     String identifier = n.getIdentifier();
-    int startsWith = identifier != null ? startsWith(identifier, nt) : 0;
+    int startsWith = identifier != null ? startsWith(identifier) : 0;
     if (startsWith != 0) {
       n.setIdentifier(identifier.substring(startsWith));
     }
@@ -148,11 +149,11 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   @Override
   public void visit(final MethodCallExpr n, final Void arg) {
     String name = n.getName().asString();
-    int startsWith = startsWith(name, nt);
-    
-    if (name.equals("$get")) {
+    int startsWith = startsWith(name);
 
-    } else if (name.equals("$set")) {
+    if (isGetter(name)) {
+      this.visit(new ArrayAccessExpr(n.getNameAsExpression(), n.getArguments().get(0)), arg);
+    } else if (isSetter(name)) {
 
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
@@ -264,8 +265,26 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     return configuration.get(new DefaultConfigurationOption(cOption));
   }
 
-  private int startsWith(String string, String strs[]) {
-    for (String str : strs) {
+  private boolean isGetter(String string) {
+    for (String str : ag) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isSetter(String string) {
+    for (String str : as) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private int startsWith(String string) {
+    for (String str : nt) {
       if (string.startsWith(str)) {
         return str.length();
       }
