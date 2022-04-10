@@ -49,7 +49,11 @@ public class JosettaChecker {
   }
 
   private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] nt) {
-    if (classOrInterface.isInnerClass() && !startsWith(classOrInterface.getNameAsString(), nt)) {
+    if (startsWith(classOrInterface.getNameAsString(), nt)) {
+      return;
+    }
+
+    if (classOrInterface.isInnerClass()) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " is an inner class. NOT COVERED.");
     }
 
