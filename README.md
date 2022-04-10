@@ -19,9 +19,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - conventions
   - first golden rule, write Java code as if you are writing ES6 code
   - always use the "this." prefix to reference a parameter or a method
-  - always use the "ClassName." prefix to reference a static parameter or a static method
-  - if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with ***$*** symbol;
-    in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name>
+  - always use the "ClassName." prefix to reference a static parameter or a static method  
 - covered features
   - imports (they are omitted)
   - generics (they are omitted)
@@ -49,6 +47,30 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
     [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
     (for example by means of the ***$*** features described above)
 
+### Special Use Case
+- if you are using the Array object available in [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
+  or if you are simulating arrays by means of your own class, then you can use the special methods $get/$set to get/set the array values.
+  For example the following code snippet:
+  ```
+  Array array = new Array();
+  ...
+  array.$set(0, 1);
+  ...
+  int value = array.$get(0);
+  ```
+  will be transpiled into:
+  ```
+  let array = new Array();
+  ...
+  array[0] = 1;
+  ...
+  let value = array[0];
+  ```
+- if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see below)
+- if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
+  in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name>
+- if you cannot use the ***$*** symbol then you can define new symbols (see below)
+
 ## Dependencies
 - JavaParser - [link](https://javaparser.org/)
 - Apache Commons CLI - [link](https://commons.apache.org/proper/commons-cli/)
@@ -64,11 +86,14 @@ java -jar <josetta-jar> -in <in> -out <out> -w
 ```
 The following table explains the parameters
 
-| Parameter | Description | Mandatory |
-| - | - | - |
-| in  | the input file/folder  | true |
-| out | the output file/folder | true |
-| w   | if available josetta will indefinitely watch for files changes in the input folder and automatically transpile the files | false |
+| Parameter | Description | Mandatory | Default |
+| - | - | - | - |
+| in  | the input file/folder  | true | no default value |
+| out | the output file/folder | true | no default value |
+| w   | if available josetta will indefinitely watch for files changes in the input folder and automatically transpile the files | false | no default value |
+| ag  | array getter methods, as a string of comma separated values | false | "$get" |
+| as  | array setter methods, as a string of comma separated values | false | "$set" | 
+| nts | no transpilation symbol, as a string of comma separated values | false | "$" |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
