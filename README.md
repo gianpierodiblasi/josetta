@@ -45,7 +45,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
     [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   - any JS external library can be "simulated" (if available) by using
     [jsweet candies](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/candies/) or you can write your "simulation"
-    (for example by means of the ***$*** features described below)
+    (for example by means of the ***$*** features described [below](https://github.com/gianpierodiblasi/josetta#run))
 
 ### Special Use Cases
 - if you are using the Array object available in [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
@@ -67,11 +67,11 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   let value = array[0];
   ```
 - as a side effect you cannot declare methods named $get/$get otherwise they will be treated as array access methods
-- if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see below)
+- if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see [below](https://github.com/gianpierodiblasi/josetta#run))
 - if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
   in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name> (pay attention to
   the $get/$set side effect described above)
-- if you cannot use the ***$*** symbol then you can define new symbols (see below)
+- if you cannot use the ***$*** symbol then you can define new symbols (see [below](https://github.com/gianpierodiblasi/josetta#run))
 
 ## Dependencies
 - JavaParser - [link](https://javaparser.org/)
