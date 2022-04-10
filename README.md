@@ -66,6 +66,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   ...
   let value = array[0];
   ```
+- as a side effect you cannot declare methods named $get/$get otherwise they will be treated as array access methods
 - if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see below)
 - if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
   in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name>

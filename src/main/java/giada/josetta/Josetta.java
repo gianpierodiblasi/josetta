@@ -45,8 +45,10 @@ public class Josetta {
     String javaCode = Files.readString(in.toPath());
     String esCode = Josetta.transpile(javaCode, ag, as, nt).replaceAll("\\R{3,}+", "\n");
 
-    out.getParentFile().mkdirs();
-    Files.writeString(out.toPath(), esCode);
+    if (!esCode.trim().isEmpty() && !esCode.isBlank()) {
+      out.getParentFile().mkdirs();
+      Files.writeString(out.toPath(), esCode);
+    }
   }
 
   /**

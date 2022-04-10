@@ -152,9 +152,13 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     int startsWith = startsWith(name);
 
     if (isGetter(name)) {
-      this.visit(new ArrayAccessExpr(n.getNameAsExpression(), n.getArguments().get(0)), arg);
+      this.visit(new ArrayAccessExpr(n.getScope().get().asNameExpr(), n.getArguments().get(0)), arg);
     } else if (isSetter(name)) {
-//TODO
+      n.getName().accept(this, arg);
+      printer.print("[");
+      n.getArguments().get(0).accept(this, arg);
+      printer.print("] = ");
+      n.getArguments().get(1).accept(this, arg);
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
