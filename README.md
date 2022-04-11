@@ -81,9 +81,9 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   ```
   let obj = ...;
   ...
-  let b1 = !!obj;
+  let b1 = !!(obj);
   ...
-  let b2 = !!!obj;
+  let b2 = !!!(obj);
   ```
 - <a name="exists_side_effect"></a>as a side effect you cannot declare methods named $exists otherwise they will be treated as comparison with *null*, *undefined*,
   empty strings and zero
