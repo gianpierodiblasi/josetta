@@ -181,9 +181,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       printer.print("] = ");
       n.getArguments().get(1).accept(this, arg);
     } else if (isExists(name)) {
-      printer.print("!!(");
       n.getArguments().get(0).accept(this, arg);
-      printer.print(")");
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
