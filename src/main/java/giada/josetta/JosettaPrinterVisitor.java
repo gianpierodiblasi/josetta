@@ -11,13 +11,16 @@ import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
+import static com.github.javaparser.ast.expr.BinaryExpr.Operator.EQUALS;
+import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
@@ -35,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The Josetta printer visitor
@@ -43,7 +48,8 @@ import java.util.Optional;
  */
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
-  private final String[] ag, as, nt;
+  private final Set<String> globals = new TreeSet<>();
+  private final String[] ag, as, ex, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -52,14 +58,25 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
    *
    * @param ag The list of array getter methods
    * @param as The list of array setter methods
+   * @param ex The list of exists methods
    * @param nt The list of no transpilation symbols
    */
-  public JosettaPrinterVisitor(String[] ag, String[] as, String[] nt) {
+  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] nt) {
     super(new DefaultPrinterConfiguration().addOption(JosettaPrinterVisitor.INDENTATION_OPTION));
 
     this.ag = ag;
     this.as = as;
+    this.ex = ex;
     this.nt = nt;
+  }
+
+  /**
+   * Returns the global comment
+   *
+   * @return The global comment
+   */
+  public Set<String> getGlobals() {
+    return globals;
   }
 
   @Override
@@ -123,8 +140,11 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     String name = n.getType().getName().asString();
     int startsWith = startsWith(name);
     if (startsWith != 0) {
-      n.getType().setName(name.substring(startsWith));
+      name = name.substring(startsWith);
+      n.getType().setName(name);
     }
+    globals.add(name);
+
     super.visit(n, arg);
   }
 
@@ -136,20 +156,21 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   }
 
   @Override
-  @SuppressWarnings("null")
-  public void visit(MethodReferenceExpr n, Void arg) {
-    String identifier = n.getIdentifier();
-    int startsWith = identifier != null ? startsWith(identifier) : 0;
-    if (startsWith != 0) {
-      n.setIdentifier(identifier.substring(startsWith));
-    }
-    super.visit(n, arg);
-  }
-
-  @Override
   public void visit(final MethodCallExpr n, final Void arg) {
     String name = n.getName().asString();
     int startsWith = startsWith(name);
+
+    Optional<Expression> scope = n.getScope();
+    scope.ifPresentOrElse(expression -> expression.ifNameExpr(exp -> {
+      String scopeName = exp.getNameAsString();
+      if (scopeName.matches("[A-Z]\\w*")) {
+        globals.add(scopeName);
+      }
+    }), () -> {
+      if (!isGetter(name) && !isSetter(name) && !isExists(name)) {
+        globals.add(name);
+      }
+    });
 
     if (isGetter(name)) {
       this.visit(new ArrayAccessExpr(n.getScope().get().asNameExpr(), n.getArguments().get(0)), arg);
@@ -159,12 +180,28 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       n.getArguments().get(0).accept(this, arg);
       printer.print("] = ");
       n.getArguments().get(1).accept(this, arg);
+    } else if (isExists(name)) {
+      printer.print("!!(");
+      n.getArguments().get(0).accept(this, arg);
+      printer.print(")");
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
     } else {
       super.visit(n, arg);
     }
+  }
+
+  @Override
+  public void visit(VariableDeclarator n, Void arg) {
+    n.getInitializer().ifPresent(initializer -> initializer.ifFieldAccessExpr(exp -> exp.getScope().ifNameExpr(scope -> {
+      String scopeName = scope.getNameAsString();
+      if (scopeName.matches("[A-Z]\\w*")) {
+        globals.add(scopeName);
+      }
+    })));
+
+    super.visit(n, arg);
   }
 
   @Override
@@ -280,6 +317,15 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private boolean isSetter(String string) {
     for (String str : as) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isExists(String string) {
+    for (String str : ex) {
       if (string.equals(str)) {
         return true;
       }

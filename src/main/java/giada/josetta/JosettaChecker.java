@@ -35,10 +35,11 @@ public class JosettaChecker {
    * @param compilationUnit The compilation unit
    * @param ag The list of array getter methods
    * @param as The list of array setter methods
+   * @param ex The list of exists methods
    * @param nt The list of no transpilation symbols
    */
-  public static void checkCompilationUnit(CompilationUnit compilationUnit, String[] ag, String[] as, String[] nt) {
-    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, ag, as, nt));
+  public static void checkCompilationUnit(CompilationUnit compilationUnit, String[] ag, String[] as, String[] ex, String[] nt) {
+    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, ag, as, ex, nt));
     compilationUnit.findAll(EnumDeclaration.class).forEach(enumDeclaration -> JosettaChecker.checkEnumDeclaration(enumDeclaration));
     compilationUnit.findAll(ConstructorDeclaration.class).forEach(constructor -> JosettaChecker.checkConstructor(constructor));
     compilationUnit.findAll(FieldDeclaration.class).forEach(field -> JosettaChecker.checkField(field));
@@ -48,7 +49,7 @@ public class JosettaChecker {
     compilationUnit.findAll(VariableDeclarationExpr.class).forEach(variable -> JosettaChecker.checkVariableDeclarationExpr(variable));
   }
 
-  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] nt) {
+  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] nt) {
     if (startsWith(classOrInterface.getNameAsString(), nt)) {
       return;
     }
@@ -81,12 +82,12 @@ public class JosettaChecker {
     classOrInterface.setStatic(false);
     classOrInterface.setTypeParameters(new NodeList<>());
 
-    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, ag, as, nt);
+    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, ag, as, ex, nt);
     JosettaChecker.checkFields(classOrInterface, map);
   }
 
-  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] nt) {
-    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt) && !isGetterOrSetter(method.getNameAsString(), ag, as)).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
+  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] nt) {
+    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt) && !is$method(method.getNameAsString(), new String[][]{ag, as, ex})).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
 
     if (map.values().stream().anyMatch(value -> value > 1)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some overloaded methods");
@@ -164,9 +165,8 @@ public class JosettaChecker {
     if (variable.getInitializer().isEmpty()) {
       Type type = variable.getType();
 
-      type.ifClassOrInterfaceType(ty -> {
-        variable.setInitializer(new NullLiteralExpr());
-      });
+      type.ifClassOrInterfaceType(ty -> variable.setInitializer(new NullLiteralExpr()));
+      type.ifArrayType(ty -> variable.setInitializer(new NullLiteralExpr()));
 
       type.ifPrimitiveType(ty -> {
         switch (ty.getType()) {
@@ -212,15 +212,12 @@ public class JosettaChecker {
     return false;
   }
 
-  private static boolean isGetterOrSetter(String string, String strs1[], String[] strs2) {
-    for (String str : strs1) {
-      if (string.equals(str)) {
-        return true;
-      }
-    }
-    for (String str : strs2) {
-      if (string.equals(str)) {
-        return true;
+  private static boolean is$method(String string, String strs[][]) {
+    for (String[] str : strs) {
+      for (String s : str) {
+        if (string.equals(s)) {
+          return true;
+        }
       }
     }
     return false;
