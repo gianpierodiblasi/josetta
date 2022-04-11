@@ -17,6 +17,7 @@ import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.EQUALS;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
+import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
@@ -24,8 +25,10 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithExpression;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
@@ -181,7 +184,30 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       printer.print("] = ");
       n.getArguments().get(1).accept(this, arg);
     } else if (isExists(name)) {
-      n.getArguments().get(0).accept(this, arg);
+      n.getParentNode().ifPresentOrElse(node -> {
+        if (VariableDeclarator.class.isInstance(node)) {
+          printer.print("!!(");
+          n.getArguments().get(0).accept(this, arg);
+          printer.print(")");
+        } else if (IfStmt.class.isInstance(node)) {
+          n.getArguments().get(0).accept(this, arg);
+        } else if (BinaryExpr.class.isInstance(node)) {
+          n.getArguments().get(0).accept(this, arg);
+        } else if (ConditionalExpr.class.isInstance(node)) {
+          n.getArguments().get(0).accept(this, arg);
+        } else if (UnaryExpr.class.isInstance(node)) {
+          n.getArguments().get(0).accept(this, arg);
+        } else {
+          printer.print("!!(");
+          n.getArguments().get(0).accept(this, arg);
+          printer.print(")");
+        }
+      }, () -> {
+        printer.print("!!(");
+        n.getArguments().get(0).accept(this, arg);
+        printer.print(")");
+      });
+
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
