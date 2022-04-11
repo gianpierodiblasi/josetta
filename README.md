@@ -68,9 +68,29 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   ```
 - <a name="get_set_side_effect"></a>as a side effect you cannot declare methods named $get/$get otherwise they will be treated as array access methods
 - if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see [below](#run))
+- if you want to simulate the JavaScript behaviour relative to the comparison with *null*, *undefined*, empty strings and zero you can use the special
+  method $exists. For example the following code snippet:
+  ```
+  Object obj = ...;
+  ...
+  boolean b1 = $exists(obj);
+  ...
+  boolean b2 = !$exists(obj);
+  ```
+  will be transpiled into:
+  ```
+  let obj = ...;
+  ...
+  let b1 = !!obj;
+  ...
+  let b2 = !!!obj;
+  ```
+- <a name="exists_side_effect"></a>as a side effect you cannot declare methods named $exists otherwise they will be treated as comparison with *null*, *undefined*,
+  empty strings and zero
+- if you cannot use the $exists methods then you can define new exists methods (see [below](#run))
 - <a name="$symbol"></a>if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
   in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name> (pay attention to
-  the $get/$set side effect described [above](#get_set_side_effect))
+  the $get/$set side effect described [above](#get_set_side_effect) and the $exists side effect described [above](#exists_side_effect))
 - if you cannot use the ***$*** symbol then you can define new symbols (see [below](#run))
 
 ## Dependencies
@@ -84,7 +104,10 @@ In order to perform a build you can use maven CLI or any IDE compatible with mav
 ## Run
 josetta can be embedded in your Java project or can be used by its CLI. The following is an example how to run josetta by command line:
 ```
-java -jar <josetta-jar> -in <in> -out <out> -w -ag <array-getter-methods> -as <array-setter-methods> -nt <no-transpilation-symbols>
+java -jar <josetta-jar> -in <in> -out <out> -w
+  -ag <array-getter-methods> -as <array-setter-methods>
+  -ex <exists-methods>
+  -nt <no-transpilation-symbols>
 ```
 The following table explains the parameters
 
@@ -95,7 +118,8 @@ The following table explains the parameters
 | w   | if available josetta will indefinitely watch for files changes in the input folder and automatically transpile the files | false | no default value |
 | ag  | array getter methods, as a string of comma separated values | false | "$get" |
 | as  | array setter methods, as a string of comma separated values | false | "$set" | 
-| nt | no transpilation symbols, as a string of comma separated values | false | "$" |
+| ex  | exists methods, as a string of comma separated values | false | "$exists" |
+| nt  | no transpilation symbols, as a string of comma separated values | false | "$" |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
