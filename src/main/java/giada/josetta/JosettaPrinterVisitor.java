@@ -52,7 +52,7 @@ import java.util.TreeSet;
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private final Set<String> globals = new TreeSet<>();
-  private final String[] ag, as, ex, nt;
+  private final String[] ag, as, ex, to, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -62,14 +62,16 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
    * @param ag The list of array getter methods
    * @param as The list of array setter methods
    * @param ex The list of exists methods
+   * @param to The list of typeof methods
    * @param nt The list of no transpilation symbols
    */
-  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] nt) {
+  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
     super(new DefaultPrinterConfiguration().addOption(JosettaPrinterVisitor.INDENTATION_OPTION));
 
     this.ag = ag;
     this.as = as;
     this.ex = ex;
+    this.to = to;
     this.nt = nt;
   }
 
@@ -170,7 +172,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
         globals.add(scopeName);
       }
     }), () -> {
-      if (!isGetter(name) && !isSetter(name) && !isExists(name)) {
+      if (!isGetter(name) && !isSetter(name) && !isExists(name) && !isTypeOf(name)) {
         globals.add(name);
       }
     });
@@ -208,6 +210,11 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
         printer.print(")");
       });
 
+    } else if (isTypeOf(name)) {
+      printer.print("typeof ");
+      n.getArguments().get(0).accept(this, arg);
+      printer.print(" === ");
+      n.getArguments().get(1).accept(this, arg);
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
@@ -350,6 +357,15 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private boolean isExists(String string) {
     for (String str : ex) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isTypeOf(String string) {
+    for (String str : to) {
       if (string.equals(str)) {
         return true;
       }

@@ -88,9 +88,24 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - <a name="exists_side_effect"></a>as a side effect you cannot declare methods named $exists otherwise they will be treated as comparison with *null*, *undefined*,
   empty strings and zero
 - if you cannot use the $exists methods then you can define new exists methods (see [below](#run))
+- if you want to simulate the JavaScript behaviour relative to the *typeof* comparison you can use the special method $typeof. For example the following code snippet:
+  ```
+  Object obj = ...;
+  ...
+  boolean b1 = $typeof(obj, "string");
+  ```
+  will be transpiled into:
+  ```
+  let obj = ...;
+  ...
+  let b1 = typeof obj === "string";
+  ```
+- <a name="typeof_side_effect"></a>as a side effect you cannot declare methods named $typeof otherwise they will be treated as *typeof* comparison
+- if you cannot use the $typeof methods then you can define new typeof methods (see [below](#run))
 - <a name="$symbol"></a>if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
   in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name> (pay attention to
-  the $get/$set side effect described [above](#get_set_side_effect) and the $exists side effect described [above](#exists_side_effect))
+  the $get/$set side effect described [above](#get_set_side_effect), the $exists side effect described [above](#exists_side_effect) and the $typeof side effect
+described [above](#typeof_side_effect))
 - if you cannot use the ***$*** symbol then you can define new symbols (see [below](#run))
 
 ## Dependencies
@@ -106,7 +121,7 @@ josetta can be embedded in your Java project or can be used by its CLI. The foll
 ```
 java -jar <josetta-jar> -in <in> -out <out> -w
   -ag <array-getter-methods> -as <array-setter-methods>
-  -ex <exists-methods>
+  -ex <exists-methods> -to <typeof-methods>
   -nt <no-transpilation-symbols>
 ```
 The following table explains the parameters
@@ -119,6 +134,7 @@ The following table explains the parameters
 | ag  | array getter methods, as a string of comma separated values | false | "$get" |
 | as  | array setter methods, as a string of comma separated values | false | "$set" | 
 | ex  | exists methods, as a string of comma separated values | false | "$exists" |
+| to  | typeof methods, as a string of comma separated values | false | "$typeof" |
 | nt  | no transpilation symbols, as a string of comma separated values | false | "$" |
 
 ## Donate

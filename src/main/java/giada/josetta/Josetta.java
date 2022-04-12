@@ -41,12 +41,13 @@ public class Josetta {
    * @param ag The list of array getter methods
    * @param as The list of array setter methods
    * @param ex The list of exists methods
+   * @param to The list of typeof methods
    * @param nt The list of no transpilation symbols
    * @throws Exception thrown if an error occurs
    */
-  public static void transpile(File in, File out, String[] ag, String[] as, String[] ex, String[] nt) throws Exception {
+  public static void transpile(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] nt) throws Exception {
     String javaCode = Files.readString(in.toPath());
-    String esCode = Josetta.transpile(javaCode, ag, as, ex, nt).replaceAll("\\R{3,}+", "\n");
+    String esCode = Josetta.transpile(javaCode, ag, as, ex, to, nt).replaceAll("\\R{3,}+", "\n");
 
     if (!esCode.trim().isEmpty() && !esCode.isBlank()) {
       out.getParentFile().mkdirs();
@@ -61,17 +62,18 @@ public class Josetta {
    * @param ag The list of array getter methods
    * @param as The list of array setter methods
    * @param ex The list of exists methods
+   * @param to The list of typeof methods
    * @param nt The list of no transpilation symbols
    * @return The ES6 code
    * @throws Exception thrown if an error occurs
    */
-  public static String transpile(String javaCode, String[] ag, String[] as, String[] ex, String[] nt) throws Exception {
+  public static String transpile(String javaCode, String[] ag, String[] as, String[] ex, String[] to, String[] nt) throws Exception {
     CompilationUnit compilationUnit = StaticJavaParser.parse(javaCode);
 
     Josetta.codeCleaning(compilationUnit);
-    JosettaChecker.checkCompilationUnit(compilationUnit, ag, as, ex, nt);
+    JosettaChecker.checkCompilationUnit(compilationUnit, ag, as, ex, to, nt);
 
-    JosettaPrinterVisitor visitor = new JosettaPrinterVisitor(ag, as, ex, nt);
+    JosettaPrinterVisitor visitor = new JosettaPrinterVisitor(ag, as, ex, to, nt);
     compilationUnit.accept(visitor, null);
     Set<String> globals = visitor.getGlobals();
 
@@ -84,21 +86,21 @@ public class Josetta {
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private static void transpileDir(File in, File out, String[] ag, String[] as, String[] ex, String[] nt) throws Exception {
+  private static void transpileDir(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] nt) throws Exception {
     if (!in.exists() || in.isHidden()) {
     } else if (in.isDirectory()) {
       for (File child : in.listFiles()) {
-        Josetta.transpileDir(child, new File(out, child.getName()), ag, as, ex, nt);
+        Josetta.transpileDir(child, new File(out, child.getName()), ag, as, ex, to, nt);
       }
     } else if (in.isFile() && in.getName().endsWith(".java")) {
       out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
       System.out.println("transpiling " + in + " into " + out);
-      Josetta.transpile(in, out, ag, as, ex, nt);
+      Josetta.transpile(in, out, ag, as, ex, to, nt);
     }
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private static void watch(File in, File out, String[] ag, String[] as, String[] ex, String[] nt) throws Exception {
+  private static void watch(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] nt) throws Exception {
     System.out.println("watching " + in + " into " + out);
 
     Path inPath = in.toPath();
@@ -140,11 +142,11 @@ public class Josetta {
               throw new RuntimeException(exc.getMessage(), exc);
             }
           } else {
-            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, nt);
+            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, nt);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
           if (inEventFile.isFile()) {
-            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, nt);
+            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, nt);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
           if (outEventFile.isDirectory()) {
@@ -165,13 +167,13 @@ public class Josetta {
   }
 
   @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
-  private static void transpileInWatch(File inFile, File outFile, String[] ag, String[] as, String[] ex, String[] nt) {
+  private static void transpileInWatch(File inFile, File outFile, String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
     if (inFile.isFile() && inFile.getName().endsWith(".java")) {
       outFile = new File(outFile.getParentFile(), outFile.getName().replace(".java", ".js"));
 
       try {
         System.out.println("transpiling " + inFile + " into " + outFile);
-        Josetta.transpile(inFile, outFile, ag, as, ex, nt);
+        Josetta.transpile(inFile, outFile, ag, as, ex, to, nt);
       } catch (Exception exc) {
         System.out.println(exc.getMessage());
         exc.printStackTrace();
@@ -207,6 +209,7 @@ public class Josetta {
     options.addOption(Option.builder("ag").desc("Array getter methods").argName("ag").build());
     options.addOption(Option.builder("as").desc("Array setter methods").argName("as").build());
     options.addOption(Option.builder("ex").desc("Exists methods").argName("ex").build());
+    options.addOption(Option.builder("to").desc("TypeOf methods").argName("to").build());
     options.addOption(Option.builder("nt").desc("No transpilation symbols").argName("nt").build());
 
     try {
@@ -217,12 +220,13 @@ public class Josetta {
       String ag[] = cmd.hasOption("ag") ? cmd.getOptionValue("ag").split(",") : new String[]{"$get"};
       String as[] = cmd.hasOption("as") ? cmd.getOptionValue("as").split(",") : new String[]{"$set"};
       String ex[] = cmd.hasOption("ex") ? cmd.getOptionValue("ex").split(",") : new String[]{"$exists"};
+      String to[] = cmd.hasOption("to") ? cmd.getOptionValue("to").split(",") : new String[]{"$typeof"};
       String nt[] = cmd.hasOption("nt") ? cmd.getOptionValue("nt").split(",") : new String[]{"$"};
 
       if (cmd.hasOption("w")) {
-        Josetta.watch(in, out, ag, as, ex, nt);
+        Josetta.watch(in, out, ag, as, ex, to, nt);
       } else {
-        Josetta.transpileDir(in, out, ag, as, ex, nt);
+        Josetta.transpileDir(in, out, ag, as, ex, to, nt);
       }
     } catch (ParseException ex) {
       System.out.println(ex.getMessage());
