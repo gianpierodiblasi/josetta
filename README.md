@@ -23,6 +23,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - covered features
   - imports (they are omitted)
   - generics (they are omitted)
+  - class cast (they are omitted)
   - class constructors (public, protected, private and friendly)
   - class (static) parameters (public, protected, private and friendly)
   - class (static) methods (public, protected, private and friendly)

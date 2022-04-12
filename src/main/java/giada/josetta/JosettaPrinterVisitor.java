@@ -17,6 +17,7 @@ import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.EQUALS;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
+import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -151,6 +152,13 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     globals.add(name);
 
     super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(final CastExpr n, final Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+    n.getExpression().accept(this, arg);
   }
 
   @Override
