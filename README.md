@@ -140,7 +140,7 @@ josetta can be embedded in your Java project or can be used by its CLI. The foll
 ```
 java -jar <josetta-jar> -in <in> -out <out> -w
   -ag <array-getter-methods> -as <array-setter-methods>
-  -ex <exists-methods> -to <typeof-methods>
+  -ex <exists-methods> -to <typeof-methods> -ap <apply-methods>
   -nt <no-transpilation-symbols>
 ```
 The following table explains the parameters
