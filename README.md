@@ -103,10 +103,28 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   ```
 - <a name="typeof_side_effect"></a>as a side effect you cannot declare methods named $typeof otherwise they will be treated as *typeof* comparison
 - if you cannot use the $typeof methods then you can define new typeof methods (see [below](#run))
+- if you want to simulate the JavaScript lambda functions you can use the special method $apply. For example the following code snippet:
+  ```
+  @FunctionalInterface
+  public interface $Apply_1_Void {
+    void $apply(String element);
+  }
+  ...
+  $Apply_1_Void onchange = element -> console.log(element);
+  ...
+  onchange.$apply("hello world");
+  ```
+  will be transpiled into:
+  ```
+  let onchange = element -> console.log(element);
+  ...
+  onchange("hello world");
+  ```
+- <a name="apply_side_effect"></a>as a side effect you cannot declare methods named $apply otherwise they will be treated as lambda functions
+- if you cannot use the $apply methods then you can define new apply methods (see [below](#run))
 - <a name="$symbol"></a>if you want to create a class or a method but you don't want the class/method to be transpiled then prefix its name with the ***$*** symbol;
   in the transpilation phase the class/method ***$***<class/method-name> will be replaced with <class/method-name> (pay attention to
-  the $get/$set side effect described [above](#get_set_side_effect), the $exists side effect described [above](#exists_side_effect) and the $typeof side effect
-described [above](#typeof_side_effect))
+  the side effect described [here](#get_set_side_effect), [here](#exists_side_effect), [here](#typeof_side_effect), and [here](#apply_side_effect))
 - if you cannot use the ***$*** symbol then you can define new symbols (see [below](#run))
 
 ## Dependencies
@@ -136,6 +154,7 @@ The following table explains the parameters
 | as  | array setter methods, as a string of comma separated values | false | "$set" | 
 | ex  | exists methods, as a string of comma separated values | false | "$exists" |
 | to  | typeof methods, as a string of comma separated values | false | "$typeof" |
+| ap  | apply methods, as a string of comma separated values | false | "$apply" |
 | nt  | no transpilation symbols, as a string of comma separated values | false | "$" |
 
 ## Donate
