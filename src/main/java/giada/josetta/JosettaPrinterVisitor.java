@@ -53,7 +53,7 @@ import java.util.TreeSet;
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private final Set<String> globals = new TreeSet<>();
-  private final String[] ag, as, ex, to, nt;
+  private final String[] ag, as, ex, to, ap, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -64,15 +64,17 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
    * @param as The list of array setter methods
    * @param ex The list of exists methods
    * @param to The list of typeof methods
+   * @param ap The list of apply methods
    * @param nt The list of no transpilation symbols
    */
-  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
+  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
     super(new DefaultPrinterConfiguration().addOption(JosettaPrinterVisitor.INDENTATION_OPTION));
 
     this.ag = ag;
     this.as = as;
     this.ex = ex;
     this.to = to;
+    this.ap = ap;
     this.nt = nt;
   }
 
@@ -180,7 +182,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
         globals.add(scopeName);
       }
     }), () -> {
-      if (!isGetter(name) && !isSetter(name) && !isExists(name) && !isTypeOf(name)) {
+      if (!isGetter(name) && !isSetter(name) && !isExists(name) && !isTypeOf(name) && !isApply(name)) {
         globals.add(name);
       }
     });
@@ -225,6 +227,8 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       n.getArguments().get(0).accept(this, arg);
       printer.print(" === ");
       n.getArguments().get(1).accept(this, arg);
+    } else if (isApply(name)) {
+      n.getScope().get().ifFieldAccessExpr(exp -> this.visit(new MethodCallExpr(exp.getScope(), exp.getNameAsString(), n.getArguments()), arg));
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
@@ -376,6 +380,15 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private boolean isTypeOf(String string) {
     for (String str : to) {
+      if (string.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isApply(String string) {
+    for (String str : ap) {
       if (string.equals(str)) {
         return true;
       }

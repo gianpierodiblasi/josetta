@@ -37,10 +37,11 @@ public class JosettaChecker {
    * @param as The list of array setter methods
    * @param ex The list of exists methods
    * @param to The list of typeof methods
+   * @param ap The list of apply methods
    * @param nt The list of no transpilation symbols
    */
-  public static void checkCompilationUnit(CompilationUnit compilationUnit, String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
-    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, ag, as, ex, to, nt));
+  public static void checkCompilationUnit(CompilationUnit compilationUnit, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
+    compilationUnit.findAll(ClassOrInterfaceDeclaration.class).forEach(classOrInterface -> JosettaChecker.checkClassOrInterface(classOrInterface, ag, as, ex, to, ap, nt));
     compilationUnit.findAll(EnumDeclaration.class).forEach(enumDeclaration -> JosettaChecker.checkEnumDeclaration(enumDeclaration));
     compilationUnit.findAll(ConstructorDeclaration.class).forEach(constructor -> JosettaChecker.checkConstructor(constructor));
     compilationUnit.findAll(FieldDeclaration.class).forEach(field -> JosettaChecker.checkField(field));
@@ -50,7 +51,7 @@ public class JosettaChecker {
     compilationUnit.findAll(VariableDeclarationExpr.class).forEach(variable -> JosettaChecker.checkVariableDeclarationExpr(variable));
   }
 
-  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
+  private static void checkClassOrInterface(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
     if (startsWith(classOrInterface.getNameAsString(), nt)) {
       return;
     }
@@ -83,12 +84,12 @@ public class JosettaChecker {
     classOrInterface.setStatic(false);
     classOrInterface.setTypeParameters(new NodeList<>());
 
-    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, ag, as, ex, to, nt);
+    Map<String, Long> map = JosettaChecker.checkMethods(classOrInterface, ag, as, ex, to, ap, nt);
     JosettaChecker.checkFields(classOrInterface, map);
   }
 
-  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] to, String[] nt) {
-    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt) && !is$method(method.getNameAsString(), new String[][]{ag, as, ex, to})).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
+  private static Map<String, Long> checkMethods(ClassOrInterfaceDeclaration classOrInterface, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
+    Map<String, Long> map = classOrInterface.getMethods().stream().filter(method -> !startsWith(method.getNameAsString(), nt) && !is$method(method.getNameAsString(), new String[][]{ag, as, ex, to, ap})).collect(Collectors.groupingBy(MethodDeclaration::getNameAsString, Collectors.counting()));
 
     if (map.values().stream().anyMatch(value -> value > 1)) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " has some overloaded methods");
