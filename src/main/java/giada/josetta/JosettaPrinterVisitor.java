@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The Josetta printer visitor
@@ -52,7 +50,6 @@ import java.util.TreeSet;
  */
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
-  private final Set<String> globals = new TreeSet<>();
   private final String[] ag, as, ex, to, ap, nt;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
@@ -76,15 +73,6 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     this.to = to;
     this.ap = ap;
     this.nt = nt;
-  }
-
-  /**
-   * Returns the global comment
-   *
-   * @return The global comment
-   */
-  public Set<String> getGlobals() {
-    return globals;
   }
 
   @Override
@@ -151,8 +139,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       name = name.substring(startsWith);
       n.getType().setName(name);
     }
-    globals.add(name);
-
+   
     super.visit(n, arg);
   }
 
@@ -174,18 +161,6 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   public void visit(final MethodCallExpr n, final Void arg) {
     String name = n.getName().asString();
     int startsWith = startsWith(name);
-
-    Optional<Expression> scope = n.getScope();
-    scope.ifPresentOrElse(expression -> expression.ifNameExpr(exp -> {
-      String scopeName = exp.getNameAsString();
-      if (scopeName.matches("[A-Z]\\w*")) {
-        globals.add(scopeName);
-      }
-    }), () -> {
-      if (!isGetter(name) && !isSetter(name) && !isExists(name) && !isTypeOf(name) && !isApply(name)) {
-        globals.add(name);
-      }
-    });
 
     if (isGetter(name)) {
       this.visit(new ArrayAccessExpr(n.getScope().get(), n.getArguments().get(0)), arg);
@@ -237,18 +212,6 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     } else {
       super.visit(n, arg);
     }
-  }
-
-  @Override
-  public void visit(VariableDeclarator n, Void arg) {
-    n.getInitializer().ifPresent(initializer -> initializer.ifFieldAccessExpr(exp -> exp.getScope().ifNameExpr(scope -> {
-      String scopeName = scope.getNameAsString();
-      if (scopeName.matches("[A-Z]\\w*")) {
-        globals.add(scopeName);
-      }
-    })));
-
-    super.visit(n, arg);
   }
 
   @Override

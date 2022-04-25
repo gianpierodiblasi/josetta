@@ -77,9 +77,7 @@ public class Josetta {
 
     JosettaPrinterVisitor visitor = new JosettaPrinterVisitor(ag, as, ex, to, ap, nt);
     compilationUnit.accept(visitor, null);
-    Set<String> globals = visitor.getGlobals();
-
-    return (globals.isEmpty() ? "" : "/* global " + globals.stream().collect(Collectors.joining(", ")) + " */\n\n") + visitor.toString();
+    return visitor.toString();
   }
 
   private static void codeCleaning(CompilationUnit compilationUnit) {
