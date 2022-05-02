@@ -150,6 +150,7 @@ public class JosettaChecker {
     method.setSynchronized(false);
     method.setThrownExceptions(new NodeList<>());
     method.setType(new UnknownType());
+    method.setTypeParameters(new NodeList<>());
 
     if (method.getBody().isEmpty()) {
       method.setBody(new BlockStmt());
