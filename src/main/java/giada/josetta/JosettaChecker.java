@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * The josetta checker
  *
- * @author gianpiero.di.blasi
+ * @author gianpiero.diblasi
  */
 public class JosettaChecker {
 

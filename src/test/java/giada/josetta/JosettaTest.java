@@ -4,16 +4,16 @@ public class JosettaTest {
 
   private final static String[] args1 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\src\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\src\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.java",
     "-out",
-    "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.js"
   };
 
   private final static String[] args2 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\src\\",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\src\\",
     "-out",
-    "C:\\Users\\gianpiero.di.blasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\",
     "-w"
   };
 

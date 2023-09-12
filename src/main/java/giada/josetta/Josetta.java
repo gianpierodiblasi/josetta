@@ -29,7 +29,7 @@ import org.apache.commons.cli.ParseException;
 /**
  * The main class
  *
- * @author gianpiero.di.blasi
+ * @author gianpiero.diblasi
  */
 public class Josetta {
 

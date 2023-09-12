@@ -46,7 +46,7 @@ import java.util.Optional;
 /**
  * The Josetta printer visitor
  *
- * @author gianpiero.di.blasi
+ * @author gianpiero.diblasi
  */
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
