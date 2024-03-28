@@ -52,7 +52,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - if you are using the Array object available in [jsweet-core](https://repository.jsweet.org/artifactory/libs-release-local/org/jsweet/jsweet-core/)
   or if you are simulating arrays by means of your own class, then you can use the special methods $get/$set to get/set the array values.
   For example the following code snippet:
-  ```
+  ```java
   Array array = new Array();
   ...
   array.$set(0, 1);
@@ -60,7 +60,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   int value = array.$get(0);
   ```
   will be transpiled into:
-  ```
+  ```javascript
   let array = new Array();
   ...
   array[0] = 1;
@@ -71,7 +71,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - if you cannot use the $get/$set methods then you can define new getter and setter methods for arrays (see [below](#run))
 - if you want to simulate the JavaScript behaviour relative to the comparison with *null*, *undefined*, empty strings and zero you can use the special
   method $exists. For example the following code snippet:
-  ```
+  ```java
   Object obj = ...;
   ...
   boolean b1 = $exists(obj);
@@ -79,7 +79,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   boolean b2 = !$exists(obj);
   ```
   will be transpiled into:
-  ```
+  ```javascript
   let obj = ...;
   ...
   let b1 = !!(obj);
@@ -90,13 +90,13 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   empty strings and zero
 - if you cannot use the $exists methods then you can define new exists methods (see [below](#run))
 - if you want to simulate the JavaScript behaviour relative to the *typeof* comparison you can use the special method $typeof. For example the following code snippet:
-  ```
+  ```java
   Object obj = ...;
   ...
   boolean b1 = $typeof(obj, "string");
   ```
   will be transpiled into:
-  ```
+  ```javascript
   let obj = ...;
   ...
   let b1 = typeof obj === "string";
@@ -104,7 +104,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
 - <a name="typeof_side_effect"></a>as a side effect you cannot declare methods named $typeof otherwise they will be treated as *typeof* comparison
 - if you cannot use the $typeof methods then you can define new typeof methods (see [below](#run))
 - if you want to simulate the JavaScript lambda functions you can use the special method $apply. For example the following code snippet:
-  ```
+  ```java
   @FunctionalInterface
   public interface $Apply_1_Void {
     void $apply(String element);
@@ -115,7 +115,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   onchange.$apply("hello world");
   ```
   will be transpiled into:
-  ```
+  ```javascript
   let onchange = element -> console.log(element);
   ...
   onchange("hello world");
