@@ -66,7 +66,8 @@ public class JosettaChecker {
 
     NodeList<ClassOrInterfaceType> types = classOrInterface.getExtendedTypes();
     types.addAll(classOrInterface.getImplementedTypes());
-
+    types.forEach(type -> type.setScope(null));
+    
     if (types.size() > 1) {
       throw new RuntimeException("Class/Interface " + classOrInterface.getNameAsString() + " extends/implements more than one class/interface");
     }

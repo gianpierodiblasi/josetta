@@ -17,7 +17,14 @@ public class JosettaTest {
     "-w"
   };
 
+  private final static String[] args3 = new String[]{
+    "-in",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swingjs\\TestJFrame1.java",
+    "-out",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swingjs\\TestJFrame1.js",
+  };
+  
   public static void main(String[] args) throws Exception {
-    Josetta.main(args1);
+    Josetta.main(args3);
   }
 }
