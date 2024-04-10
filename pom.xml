@@ -4,7 +4,7 @@
   
   <groupId>giada</groupId>
   <artifactId>josetta</artifactId>
-  <version>1.8.5</version>
+  <version>1.8.6</version>
   <packaging>jar</packaging>
   
   <name>josetta</name>
