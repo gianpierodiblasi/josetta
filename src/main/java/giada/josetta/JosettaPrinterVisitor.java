@@ -20,9 +20,11 @@ import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
@@ -133,13 +135,16 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(final ObjectCreationExpr n, final Void arg) {
-    String name = n.getType().getName().asString();
+    ClassOrInterfaceType type = n.getType();
+    type.setScope(null);
+
+    String name = type.getName().asString();
     int startsWith = startsWith(name);
     if (startsWith != 0) {
       name = name.substring(startsWith);
-      n.getType().setName(name);
+      type.setName(name);
     }
-   
+
     super.visit(n, arg);
   }
 
@@ -207,9 +212,10 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       expression.ifFieldAccessExpr(exp -> this.visit(new MethodCallExpr(exp.getScope(), exp.getNameAsString(), n.getArguments()), arg));
       expression.ifNameExpr(exp -> this.visit(new MethodCallExpr(null, exp.getNameAsString(), n.getArguments()), arg));
     } else if (startsWith != 0) {
-      n.setName(name.substring(startsWith));
+      n.setName((n.isQualified() ? "" : "this.") + name.substring(startsWith));
       super.visit(n, arg);
     } else {
+      n.setName((n.isQualified() ? "" : "this.") + name);
       super.visit(n, arg);
     }
   }
@@ -268,6 +274,16 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     } else {
       body.accept(this, arg);
     }
+  }
+
+  @Override
+  public void visit(FieldAccessExpr n, Void arg) {
+    String scope = n.getScope().toString();
+    int lastDot = scope.lastIndexOf('.');
+    scope = lastDot != -1 ? scope.substring(lastDot + 1) : scope;
+    n = new FieldAccessExpr(new NameExpr(scope), n.getNameAsString());
+
+    super.visit(n, arg);
   }
 
   @SuppressWarnings("null")

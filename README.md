@@ -18,7 +18,7 @@ josetta is ***NOT*** a production ready tool; if you need a professional Java to
 josetta correctly handles a very small portion of Java, so there are a lot of limitations and conventions to follow:
 - conventions
   - first golden rule, write Java code as if you are writing ES6 code
-  - always use the "this." prefix to reference a parameter or a method
+  - always use the "this." prefix to reference a parameter or a method (for methods, josetta will try to add the prefix, but it is not guaranteed)
   - always use the "ClassName." prefix to reference a static parameter or a static method  
 - covered features
   - imports (they are omitted)
