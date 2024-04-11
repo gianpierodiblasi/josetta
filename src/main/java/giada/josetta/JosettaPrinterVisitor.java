@@ -24,6 +24,7 @@ import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
@@ -286,6 +287,16 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     }
 
     super.visit(n, arg);
+  }
+
+  @Override
+  public void visit(MethodReferenceExpr n, Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+
+    printer.print("(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) => ");
+    n.getScope().accept(this, arg);
+    printer.print("." + n.getIdentifier() + "(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)");
   }
 
   @SuppressWarnings("null")
