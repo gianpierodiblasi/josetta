@@ -20,12 +20,10 @@ import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
@@ -279,18 +277,6 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     } else {
       body.accept(this, arg);
     }
-  }
-
-  @Override
-  public void visit(FieldAccessExpr n, Void arg) {
-    String scope = n.getScope().toString();
-    if (!scope.startsWith("this.")) {
-      int lastDot = scope.lastIndexOf('.');
-      scope = lastDot != -1 ? scope.substring(lastDot + 1) : scope;
-      n = new FieldAccessExpr(new NameExpr(scope), n.getNameAsString());
-    }
-
-    super.visit(n, arg);
   }
 
   @Override

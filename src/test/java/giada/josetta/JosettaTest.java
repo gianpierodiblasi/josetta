@@ -31,7 +31,14 @@ public class JosettaTest {
     "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JButton.js",
   };
   
+  private final static String[] args5 = new String[]{
+    "-in",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swingjs\\JPanel.java",
+    "-out",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JPanel.js",
+  };
+  
   public static void main(String[] args) throws Exception {
-    Josetta.main(args4);
+    Josetta.main(args5);
   }
 }
