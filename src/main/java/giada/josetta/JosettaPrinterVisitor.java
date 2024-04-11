@@ -57,6 +57,8 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
+  private boolean isApply = false;
+
   /**
    * Creates a printer visitor
    *
@@ -210,13 +212,15 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       n.getArguments().get(1).accept(this, arg);
     } else if (isApply(name)) {
       Expression expression = n.getScope().get();
+      this.isApply = true;
       expression.ifFieldAccessExpr(exp -> this.visit(new MethodCallExpr(exp.getScope(), exp.getNameAsString(), n.getArguments()), arg));
       expression.ifNameExpr(exp -> this.visit(new MethodCallExpr(null, exp.getNameAsString(), n.getArguments()), arg));
+      this.isApply = false;
     } else if (startsWith != 0) {
-      n.setName((n.isQualified() ? "" : "this.") + name.substring(startsWith));
+      n.setName((this.isApply || n.isQualified() ? "" : "this.") + name.substring(startsWith));
       super.visit(n, arg);
     } else {
-      n.setName((n.isQualified() ? "" : "this.") + name);
+      n.setName((this.isApply || n.isQualified() ? "" : "this.") + name);
       super.visit(n, arg);
     }
   }
