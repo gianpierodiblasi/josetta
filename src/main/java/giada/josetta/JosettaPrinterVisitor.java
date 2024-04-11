@@ -279,9 +279,11 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   @Override
   public void visit(FieldAccessExpr n, Void arg) {
     String scope = n.getScope().toString();
-    int lastDot = scope.lastIndexOf('.');
-    scope = lastDot != -1 ? scope.substring(lastDot + 1) : scope;
-    n = new FieldAccessExpr(new NameExpr(scope), n.getNameAsString());
+    if (!scope.startsWith("this.")) {
+      int lastDot = scope.lastIndexOf('.');
+      scope = lastDot != -1 ? scope.substring(lastDot + 1) : scope;
+      n = new FieldAccessExpr(new NameExpr(scope), n.getNameAsString());
+    }
 
     super.visit(n, arg);
   }
