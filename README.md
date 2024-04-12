@@ -23,11 +23,11 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - don't use full qualified name of classes, that is
     - don't use
   ```java
-  package.subpackage1.subpackage11.ClassName object = new package.subpackage1.subpackage11.ClassName();
+  pkg.subpkg1.subpkg11.ClassName object = new pkg.subpkg1.subpkg11.ClassName();
   ```
-    - use
+      - use
   ```java
-  import package.subpackage1.subpackage11.ClassName;
+  import pkg.subpkg1.subpkg11.ClassName;
   ClassName object = new ClassName();
   ```
 - covered features
