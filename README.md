@@ -20,12 +20,11 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - first golden rule, write Java code as if you are writing ES6 code
   - always use the "this." prefix to reference a parameter or a method (for methods, josetta will try to add the prefix, but it is not guaranteed)
   - always use the "ClassName." prefix to reference a static parameter or a static method  
-  - don't use full qualified name of classes, that is
-    - don't use
+  - don't use full qualified name of classes, that is don't use
   ```java
   pkg.subpkg1.subpkg11.ClassName object = new pkg.subpkg1.subpkg11.ClassName();
   ```
-      - use
+  and use
   ```java
   import pkg.subpkg1.subpkg11.ClassName;
   ClassName object = new ClassName();
