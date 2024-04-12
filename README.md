@@ -149,7 +149,7 @@ josetta can be embedded in your Java project or can be used by its CLI. The foll
 java -jar <josetta-jar> -in <in> -out <out> -w
   -ag <array-getter-methods> -as <array-setter-methods>
   -ex <exists-methods> -to <typeof-methods> -ap <apply-methods>
-  -nt <no-transpilation-symbols>
+  -nt <no-transpilation-symbols> -nbmo
 ```
 The following table explains the parameters
 
@@ -164,6 +164,7 @@ The following table explains the parameters
 | to  | typeof methods, as a string of comma separated values | false | "$typeof" |
 | ap  | apply methods, as a string of comma separated values | false | "$apply" |
 | nt  | no transpilation symbols, as a string of comma separated values | false | "$" |
+| nbmo| NetBeans Matisse Optimization, if available josetta will perform some optimizations for the NetBeans GUI Builder (codename Matisse) | false | no default value |
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).

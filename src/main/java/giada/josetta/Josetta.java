@@ -42,11 +42,13 @@ public class Josetta {
    * @param to The list of typeof methods
    * @param ap The list of apply methods
    * @param nt The list of no transpilation symbols
+   * @param nbmo true to perform the NetBeans Matisse Optimization, false
+   * otherwise
    * @throws Exception thrown if an error occurs
    */
-  public static void transpile(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) throws Exception {
+  public static void transpile(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) throws Exception {
     String javaCode = Files.readString(in.toPath());
-    String esCode = Josetta.transpile(javaCode, ag, as, ex, to, ap, nt).replaceAll("\\R{3,}+", "\n");
+    String esCode = Josetta.transpile(javaCode, ag, as, ex, to, ap, nt, nbmo).replaceAll("\\R{3,}+", "\n");
 
     if (!esCode.trim().isEmpty() && !esCode.isBlank()) {
       out.getParentFile().mkdirs();
@@ -64,16 +66,18 @@ public class Josetta {
    * @param to The list of typeof methods
    * @param ap The list of apply methods
    * @param nt The list of no transpilation symbols
+   * @param nbmo true to perform the NetBeans Matisse Optimization, false
+   * otherwise
    * @return The ES6 code
    * @throws Exception thrown if an error occurs
    */
-  public static String transpile(String javaCode, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) throws Exception {
+  public static String transpile(String javaCode, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) throws Exception {
     CompilationUnit compilationUnit = StaticJavaParser.parse(javaCode);
 
     Josetta.codeCleaning(compilationUnit);
     JosettaChecker.checkCompilationUnit(compilationUnit, ag, as, ex, to, ap, nt);
 
-    JosettaPrinterVisitor visitor = new JosettaPrinterVisitor(ag, as, ex, to, ap, nt);
+    JosettaPrinterVisitor visitor = new JosettaPrinterVisitor(ag, as, ex, to, ap, nt, nbmo);
     compilationUnit.accept(visitor, null);
     return visitor.toString();
   }
@@ -84,21 +88,21 @@ public class Josetta {
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private static void transpileDir(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) throws Exception {
+  private static void transpileDir(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) throws Exception {
     if (!in.exists() || in.isHidden()) {
     } else if (in.isDirectory()) {
       for (File child : in.listFiles()) {
-        Josetta.transpileDir(child, new File(out, child.getName()), ag, as, ex, to, ap, nt);
+        Josetta.transpileDir(child, new File(out, child.getName()), ag, as, ex, to, ap, nt, nbmo);
       }
     } else if (in.isFile() && in.getName().endsWith(".java")) {
       out = new File(out.getParentFile(), out.getName().replace(".java", ".js"));
       System.out.println("transpiling " + in + " into " + out);
-      Josetta.transpile(in, out, ag, as, ex, to, ap, nt);
+      Josetta.transpile(in, out, ag, as, ex, to, ap, nt, nbmo);
     }
   }
 
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  private static void watch(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) throws Exception {
+  private static void watch(File in, File out, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) throws Exception {
     System.out.println("watching " + in + " into " + out);
 
     Path inPath = in.toPath();
@@ -140,11 +144,11 @@ public class Josetta {
               throw new RuntimeException(exc.getMessage(), exc);
             }
           } else {
-            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, ap, nt);
+            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, ap, nt, nbmo);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
           if (inEventFile.isFile()) {
-            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, ap, nt);
+            Josetta.transpileInWatch(inEventFile, outEventFile, ag, as, ex, to, ap, nt, nbmo);
           }
         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
           if (outEventFile.isDirectory()) {
@@ -165,13 +169,13 @@ public class Josetta {
   }
 
   @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
-  private static void transpileInWatch(File inFile, File outFile, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
+  private static void transpileInWatch(File inFile, File outFile, String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) {
     if (inFile.isFile() && inFile.getName().endsWith(".java")) {
       outFile = new File(outFile.getParentFile(), outFile.getName().replace(".java", ".js"));
 
       try {
         System.out.println("transpiling " + inFile + " into " + outFile);
-        Josetta.transpile(inFile, outFile, ag, as, ex, to, ap, nt);
+        Josetta.transpile(inFile, outFile, ag, as, ex, to, ap, nt, nbmo);
       } catch (Exception exc) {
         System.out.println(exc.getMessage());
         exc.printStackTrace();
@@ -210,6 +214,7 @@ public class Josetta {
     options.addOption(Option.builder("to").desc("TypeOf methods").argName("to").build());
     options.addOption(Option.builder("ap").desc("Apply methods").argName("ap").build());
     options.addOption(Option.builder("nt").desc("No transpilation symbols").argName("nt").build());
+    options.addOption(Option.builder("nbmo").desc("NetBeans Matisse Optimization").argName("nbmo").build());
 
     try {
       CommandLine cmd = new DefaultParser().parse(options, args);
@@ -224,9 +229,9 @@ public class Josetta {
       String nt[] = cmd.hasOption("nt") ? cmd.getOptionValue("nt").split(",") : new String[]{"$"};
 
       if (cmd.hasOption("w")) {
-        Josetta.watch(in, out, ag, as, ex, to, ap, nt);
+        Josetta.watch(in, out, ag, as, ex, to, ap, nt, cmd.hasOption("nbmo"));
       } else {
-        Josetta.transpileDir(in, out, ag, as, ex, to, ap, nt);
+        Josetta.transpileDir(in, out, ag, as, ex, to, ap, nt, cmd.hasOption("nbmo"));
       }
     } catch (ParseException ex) {
       System.out.println(ex.getMessage());

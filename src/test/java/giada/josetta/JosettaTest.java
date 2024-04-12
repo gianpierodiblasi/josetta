@@ -39,6 +39,6 @@ public class JosettaTest {
   };
   
   public static void main(String[] args) throws Exception {
-    Josetta.main(args5);
+    Josetta.main(args3);
   }
 }

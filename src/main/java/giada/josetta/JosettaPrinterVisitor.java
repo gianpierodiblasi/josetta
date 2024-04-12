@@ -14,6 +14,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.EQUALS;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.NOT_EQUALS;
@@ -24,11 +25,13 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithExpression;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -52,6 +55,7 @@ import java.util.Optional;
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private final String[] ag, as, ex, to, ap, nt;
+  private final boolean nbmo;
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -64,8 +68,10 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
    * @param to The list of typeof methods
    * @param ap The list of apply methods
    * @param nt The list of no transpilation symbols
+   * @param nbmo true to perform the NetBeans Matisse Optimization, false
+   * otherwise
    */
-  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt) {
+  public JosettaPrinterVisitor(String[] ag, String[] as, String[] ex, String[] to, String[] ap, String[] nt, boolean nbmo) {
     super(new DefaultPrinterConfiguration().addOption(JosettaPrinterVisitor.INDENTATION_OPTION));
 
     this.ag = ag;
@@ -74,6 +80,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     this.to = to;
     this.ap = ap;
     this.nt = nt;
+    this.nbmo = nbmo;
   }
 
   @Override
@@ -213,9 +220,31 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
+    } else if (nbmo) {
+      this.netBeansMatiseOptimizationMethodCallExpr(n, arg, name);
     } else {
       super.visit(n, arg);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void netBeansMatiseOptimizationMethodCallExpr(final MethodCallExpr n, final Void arg, String name) {
+    switch (name) {
+      case "getContentPane":
+      case "setTitle":
+        Node parentNode = n.getParentNode().orElse(null);
+        while (parentNode != null && !(parentNode instanceof MethodDeclaration)) {
+          parentNode = parentNode.getParentNode().orElse(null);
+        }
+        if (parentNode != null && ((NodeWithSimpleName<MethodDeclaration>) parentNode).getNameAsString().equals("initComponents")) {
+          n.setName("this." + name);
+        }
+        break;
+      default:
+        break;
+    }
+
+    super.visit(n, arg);
   }
 
   @Override
@@ -282,6 +311,37 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     printer.print("(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) => ");
     n.getScope().accept(this, arg);
     printer.print("." + n.getIdentifier() + "(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)");
+  }
+
+  @Override
+  public void visit(AssignExpr n, Void arg) {
+    if (nbmo) {
+      this.netBeansMatiseOptimizationAssignExpr(n, arg);
+    } else {
+      super.visit(n, arg);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void netBeansMatiseOptimizationAssignExpr(final AssignExpr n, final Void arg) {
+    Expression target = n.getTarget();
+    if (target.isNameExpr()) {
+      Node parentNode = n.getParentNode().orElse(null);
+      while (parentNode != null && !(parentNode instanceof MethodDeclaration)) {
+        parentNode = parentNode.getParentNode().orElse(null);
+      }
+
+      if (parentNode instanceof MethodDeclaration && ((NodeWithSimpleName<MethodDeclaration>) parentNode).getNameAsString().equals("initComponents")) {
+        String name = ((NodeWithSimpleName<NameExpr>) target).getNameAsString();
+        ((NodeWithSimpleName<NameExpr>) target).setName("this." + name);
+        super.visit(n, arg);
+        printer.print(";let " + name + " = this." + name);
+      } else {
+        super.visit(n, arg);
+      }
+    } else {
+      super.visit(n, arg);
+    }
   }
 
   @SuppressWarnings("null")
