@@ -25,7 +25,6 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
@@ -55,7 +54,11 @@ import java.util.Optional;
 public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private final String[] ag, as, ex, to, ap, nt;
+
   private final boolean nbmo;
+  private final List<String> nbmoList = List.of("getContentPane", "setTitle");
+  private boolean initComponents;
+
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
   private final static DefaultConfigurationOption INDENTATION_OPTION = new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.INDENTATION, JosettaPrinterVisitor.INDENTATION);
 
@@ -163,8 +166,11 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(final MethodDeclaration n, final Void arg) {
-    if (startsWith(n.getNameAsString()) == 0) {
+    String name = n.getNameAsString();
+    if (startsWith(name) == 0) {
+      initComponents = name.equals("initComponents");
       super.visit(n, arg);
+      initComponents = false;
     }
   }
 
@@ -220,31 +226,12 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
     } else if (startsWith != 0) {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
-    } else if (nbmo) {
-      this.netBeansMatiseOptimizationMethodCallExpr(n, arg, name);
+    } else if (nbmo && initComponents) {
+      n.setName((nbmoList.contains(name) ? "this." : "") + name);
+      super.visit(n, arg);
     } else {
       super.visit(n, arg);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void netBeansMatiseOptimizationMethodCallExpr(final MethodCallExpr n, final Void arg, String name) {
-    switch (name) {
-      case "getContentPane":
-      case "setTitle":
-        Node parentNode = n.getParentNode().orElse(null);
-        while (parentNode != null && !(parentNode instanceof MethodDeclaration)) {
-          parentNode = parentNode.getParentNode().orElse(null);
-        }
-        if (parentNode != null && ((NodeWithSimpleName<MethodDeclaration>) parentNode).getNameAsString().equals("initComponents")) {
-          n.setName("this." + name);
-        }
-        break;
-      default:
-        break;
-    }
-
-    super.visit(n, arg);
   }
 
   @Override
@@ -315,30 +302,12 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(AssignExpr n, Void arg) {
-    if (nbmo) {
-      this.netBeansMatiseOptimizationAssignExpr(n, arg);
-    } else {
+    if (nbmo && initComponents) {
+      NodeWithSimpleName<?> target = (NodeWithSimpleName) n.getTarget();
+      String name = target.getNameAsString();
+      target.setName("this." + name);
       super.visit(n, arg);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void netBeansMatiseOptimizationAssignExpr(final AssignExpr n, final Void arg) {
-    Expression target = n.getTarget();
-    if (target.isNameExpr()) {
-      Node parentNode = n.getParentNode().orElse(null);
-      while (parentNode != null && !(parentNode instanceof MethodDeclaration)) {
-        parentNode = parentNode.getParentNode().orElse(null);
-      }
-
-      if (parentNode instanceof MethodDeclaration && ((NodeWithSimpleName<MethodDeclaration>) parentNode).getNameAsString().equals("initComponents")) {
-        String name = ((NodeWithSimpleName<NameExpr>) target).getNameAsString();
-        ((NodeWithSimpleName<NameExpr>) target).setName("this." + name);
-        super.visit(n, arg);
-        printer.print(";let " + name + " = this." + name);
-      } else {
-        super.visit(n, arg);
-      }
+      printer.print(";let " + name + " = this." + name);
     } else {
       super.visit(n, arg);
     }

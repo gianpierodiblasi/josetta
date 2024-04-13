@@ -22,22 +22,23 @@ public class JosettaTest {
     "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swingjs\\TestJFrame1.java",
     "-out",
     "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swingjs\\TestJFrame1.js",
+    "-nbmo"
   };
-  
+
   private final static String[] args4 = new String[]{
     "-in",
     "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swingjs\\JButton.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JButton.js",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JButton.js"
   };
-  
+
   private final static String[] args5 = new String[]{
     "-in",
     "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swingjs\\JPanel.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JPanel.js",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JPanel.js"
   };
-  
+
   public static void main(String[] args) throws Exception {
     Josetta.main(args3);
   }

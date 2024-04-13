@@ -2,7 +2,7 @@
 A Java to ES6 Transpiler (WORK IN PROGRESS!)
 
 ## Description
-![josetta-mini.png](https://github.com/gianpierodiblasi/josetta/blob/master/josetta-mini.png?raw=true)
+![josetta-mini.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/josetta-mini.png?raw=true)
 
 josetta is the inverted acronym of A Transpiler To ES6 of Old Java, or if you prefer is the union of Java and
 [Rosetta](https://en.wikipedia.org/wiki/Rosetta_Stone).
@@ -165,6 +165,28 @@ The following table explains the parameters
 | ap  | apply methods, as a string of comma separated values | false | "$apply" |
 | nt  | no transpilation symbols, as a string of comma separated values | false | "$" |
 | nbmo| NetBeans Matisse Optimization, if available josetta will perform some optimizations for the NetBeans GUI Builder (codename Matisse) | false | no default value |
+
+### NetBeans Matisse Optimization
+The NetBeans Matisse Optimization parameter needs a more in deep description: when the NetBeans GUI Builder is used, the IDE automatically creates a method called *initComponents*;
+this method is not editable so it is not possibile to use the "this." prefix to reference parameters and methods, leading to the problems shown with a red arrow in the following image.
+![problem.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/problem.png?raw=true)
+If the *nbmo* parameter is set then josetta performs the following tasks:
+- finds the *initComponents* method and inside it
+- adds the "this." prefix to the method calls
+  - setTitle
+  - getContentPane
+- adds the "this." prefix to each instance variable declaration
+- creates a local variable with the same name of the corresponding instance variable
+The following image shows the result.
+![solution.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/solution.png?raw=true)
+As a side effect, if you set the *nbmo* parameter then you cannot declare methods called *initComponents* otherwise they will be treated as described above.
+Two more thing are necessary to use the NetBeans GUI Builder and obtain a correct translation:
+- the Listener Generation Style has to be set to "Lambdas or Anonymous Inner Classes"
+- the Generate Fully Qualified Names of Classes checkbox has to be deselected
+This can be done globally for all UI
+![matisse-global.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/matisse-global.png?raw=true)
+or locally for one UI
+![matisse-local.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/matisse-local.png?raw=true)
 
 ## Donate
 If you would like to support the development of this and/or other projects, consider making a [donation](https://www.paypal.com/donate/?business=HCDX9BAEYDF4C&no_recurring=0&currency_code=EUR).
