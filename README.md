@@ -172,8 +172,7 @@ this method is not editable so it is not possibile to use the "this." prefix to 
 
 ![problem.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/problem.png?raw=true)
 
-If the *nbmo* parameter is set then josetta performs the following tasks:
-- finds the *initComponents* method and inside it
+If the *nbmo* parameter is set then josetta finds the *initComponents* method and inside it
 - adds the "this." prefix to the method calls
   - setTitle
   - getContentPane
