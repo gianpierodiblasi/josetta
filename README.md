@@ -169,7 +169,9 @@ The following table explains the parameters
 ### NetBeans Matisse Optimization
 The NetBeans Matisse Optimization parameter needs a more in deep description: when the NetBeans GUI Builder is used, the IDE automatically creates a method called *initComponents*;
 this method is not editable so it is not possibile to use the "this." prefix to reference parameters and methods, leading to the problems shown with a red arrow in the following image.
+
 ![problem.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/problem.png?raw=true)
+
 If the *nbmo* parameter is set then josetta performs the following tasks:
 - finds the *initComponents* method and inside it
 - adds the "this." prefix to the method calls
@@ -177,15 +179,23 @@ If the *nbmo* parameter is set then josetta performs the following tasks:
   - getContentPane
 - adds the "this." prefix to each instance variable declaration
 - creates a local variable with the same name of the corresponding instance variable
+
 The following image shows the result.
+
 ![solution.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/solution.png?raw=true)
+
 As a side effect, if you set the *nbmo* parameter then you cannot declare methods called *initComponents* otherwise they will be treated as described above.
+
 Two more thing are necessary to use the NetBeans GUI Builder and obtain a correct translation:
 - the Listener Generation Style has to be set to "Lambdas or Anonymous Inner Classes"
 - the Generate Fully Qualified Names of Classes checkbox has to be deselected
+
 This can be done globally for all UI
+
 ![matisse-global.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/matisse-global.png?raw=true)
+
 or locally for one UI
+
 ![matisse-local.png](https://github.com/gianpierodiblasi/josetta/blob/master/readme/matisse-local.png?raw=true)
 
 ## Donate
