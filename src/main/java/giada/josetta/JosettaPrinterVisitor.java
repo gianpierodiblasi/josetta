@@ -56,7 +56,8 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   private final String[] ag, as, ex, to, ap, nt;
 
   private final boolean nbmo;
-  private final List<String> nbmoList = List.of("getContentPane", "setTitle");
+  private final List<String> nbmoMethodList = List.of("getContentPane", "setTitle");
+  private final List<String> nbmoVariableListNO = List.of("gridBagConstraints");
   private boolean initComponents;
 
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
@@ -227,7 +228,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
     } else if (nbmo && initComponents) {
-      n.setName((nbmoList.contains(name) ? "this." : "") + name);
+      n.setName((nbmoMethodList.contains(name) ? "this." : "") + name);
       super.visit(n, arg);
     } else {
       super.visit(n, arg);
@@ -304,10 +305,20 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   public void visit(AssignExpr n, Void arg) {
     if (nbmo && initComponents) {
       NodeWithSimpleName<?> target = (NodeWithSimpleName) n.getTarget();
+      
+      boolean startsWith = false;
       String name = target.getNameAsString();
-      target.setName("this." + name);
-      super.visit(n, arg);
-      printer.print(";let " + name + " = this." + name);
+      for (String variable : nbmoVariableListNO) {
+        startsWith |= target.toString().startsWith(variable);
+      }
+
+      if (!startsWith && !nbmoVariableListNO.contains(name)) {
+        target.setName("this." + name);
+        super.visit(n, arg);
+        printer.print(";let " + name + " = this." + name);
+      } else {
+        super.visit(n, arg);
+      }
     } else {
       super.visit(n, arg);
     }

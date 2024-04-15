@@ -19,27 +19,35 @@ public class JosettaTest {
 
   private final static String[] args3 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swingjs\\TestJFrame1.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swing\\TestJFrame1.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swingjs\\TestJFrame1.js",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swing\\TestJFrame1.js",
     "-nbmo"
   };
 
   private final static String[] args4 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swingjs\\JButton.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swing\\JButton.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JButton.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swing\\JButton.js"
   };
 
   private final static String[] args5 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swingjs\\JPanel.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swing\\JPanel.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swingjs\\JPanel.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swing\\JPanel.js"
   };
 
+  private final static String[] args6 = new String[]{
+    "-in",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swing\\TestJFrame2.java",
+    "-out",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swing\\TestJFrame2.js",
+    "-nbmo"
+  };
+  
   public static void main(String[] args) throws Exception {
-    Josetta.main(args3);
+    Josetta.main(args6);
   }
 }
