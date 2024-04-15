@@ -14,6 +14,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.expr.ArrayCreationExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import static com.github.javaparser.ast.expr.BinaryExpr.Operator.EQUALS;
@@ -57,7 +58,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   private final boolean nbmo;
   private final List<String> nbmoMethodList = List.of("getContentPane", "setTitle");
-  private final List<String> nbmoVariableListNO = List.of("gridBagConstraints");
+  private final List<String> nbmoVariableListNO = List.of("gridBagConstraints", "layout");
   private boolean initComponents;
 
   private final static Indentation INDENTATION = new Indentation(Indentation.IndentType.SPACES, 2);
@@ -305,7 +306,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
   public void visit(AssignExpr n, Void arg) {
     if (nbmo && initComponents) {
       NodeWithSimpleName<?> target = (NodeWithSimpleName) n.getTarget();
-      
+
       boolean startsWith = false;
       String name = target.getNameAsString();
       for (String variable : nbmoVariableListNO) {
@@ -319,6 +320,20 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       } else {
         super.visit(n, arg);
       }
+    } else {
+      super.visit(n, arg);
+    }
+  }
+
+  @Override
+  public void visit(ArrayCreationExpr n, Void arg) {
+    if (nbmo && initComponents) {
+      printer.print("[");
+      n.getInitializer().ifPresent(initializer -> initializer.getValues().forEach(expression -> {
+        expression.accept(this, arg);
+        printer.print(", ");
+      }));
+      printer.print("]");
     } else {
       super.visit(n, arg);
     }
