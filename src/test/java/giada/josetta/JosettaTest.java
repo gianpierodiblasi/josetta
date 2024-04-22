@@ -19,35 +19,43 @@ public class JosettaTest {
 
   private final static String[] args3 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swing\\TestJFrame1.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\javascript\\swing\\TestJFrame1.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swing\\TestJFrame1.js",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\javascript\\swing\\TestJFrame1.js",
     "-nbmo"
   };
 
   private final static String[] args4 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swing\\JButton.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\javascript\\swing\\JButton.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swing\\JButton.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\javascript\\swing\\JButton.js"
   };
 
   private final static String[] args5 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\giada\\swing\\JPanel.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\src\\javascript\\swing\\JPanel.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\giada\\swing\\JPanel.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile\\javascript\\swing\\JPanel.js"
   };
 
   private final static String[] args6 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\giada\\swing\\TestJFrame2.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\javascript\\swing\\TestJFrame2.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\giada\\swing\\TestJFrame2.js",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\javascript\\swing\\TestJFrame2.js",
+    "-nbmo"
+  };
+  
+  private final static String[] args7 = new String[]{
+    "-in",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\test\\javascript\\swing\\TestJFrame5.java",
+    "-out",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\swing.js\\transpile-test\\javascript\\swing\\TestJFrame5.js",
     "-nbmo"
   };
   
   public static void main(String[] args) throws Exception {
-    Josetta.main(args6);
+    Josetta.main(args7);
   }
 }

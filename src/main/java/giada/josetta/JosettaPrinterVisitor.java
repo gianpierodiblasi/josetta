@@ -229,7 +229,7 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
       n.setName(name.substring(startsWith));
       super.visit(n, arg);
     } else if (nbmo && initComponents) {
-      n.setName((nbmoMethodList.contains(name) ? "this." : "") + name);
+      n.setName((nbmoMethodList.contains(name) && !n.isQualified() ? "this." : "") + name);
       super.visit(n, arg);
     } else {
       super.visit(n, arg);
