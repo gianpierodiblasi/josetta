@@ -4,9 +4,9 @@ public class JosettaTest {
 
   private final static String[] args1 = new String[]{
     "-in",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\src\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.java",
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\src\\pizzapazza\\math\\Z4SignEnum.java",
     "-out",
-    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\giada\\pizzapazza\\ui\\Z4ModalMessageUI.js"
+    "C:\\Users\\gianpiero.diblasi\\codice\\Personale\\pizzApazzAinfinity\\transpile\\pizzapazza\\math\\Z4SignEnum.js"
   };
 
   private final static String[] args2 = new String[]{
@@ -56,6 +56,6 @@ public class JosettaTest {
   };
   
   public static void main(String[] args) throws Exception {
-    Josetta.main(args7);
+    Josetta.main(args1);
   }
 }

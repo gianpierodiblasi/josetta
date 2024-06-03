@@ -118,10 +118,28 @@ public class JosettaPrinterVisitor extends DefaultPrettyPrinterVisitor {
 
   @Override
   public void visit(EnumConstantDeclaration n, Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+    
+    printer.print("static ");
+    n.getName().accept(this, arg);
+    printer.println(" = '" + n.getName() + "';");
   }
 
   @Override
   public void visit(EnumDeclaration n, Void arg) {
+    printOrphanCommentsBeforeThisChildNode(n);
+    printComment(n.getComment(), arg);
+
+    printer.print("class ");
+    n.getName().accept(this, arg);
+
+    printer.println(" {");
+    printer.indent();
+    printer.println();
+    n.getEntries().forEach(entry -> entry.accept(this, arg));
+    printer.unindent();
+    printer.print("}");
   }
 
   @Override

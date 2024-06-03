@@ -42,7 +42,7 @@ josetta correctly handles a very small portion of Java, so there are a lot of li
   - interfaces and abstract classes (public, protected, private and friendly) are converted into class (empty methods are appropriately managed)
   - multiple inheritance (classes and interfaces) is not covered, each class can extend only one class/interface
   - inner interfaces and classes are not covered
-  - enums are not covered
+  - enums are covered, but can be used only as a list of constant values (no constructors, no methods, no iterators, etc.)
   - constructor overloading is not covered
   - method overloading is not covered
   - parameters and methods cannot have the same name

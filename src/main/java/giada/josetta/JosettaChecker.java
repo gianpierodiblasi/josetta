@@ -107,7 +107,13 @@ public class JosettaChecker {
   }
 
   private static void checkEnumDeclaration(EnumDeclaration enumDeclaration) {
-    throw new RuntimeException(enumDeclaration.getNameAsString() + " is an enum. NOT COVERED.");
+    enumDeclaration.setAnnotations(new NodeList<>());
+    enumDeclaration.setImplementedTypes(new NodeList<>());
+    enumDeclaration.setModifiers(new NodeList<>());
+    enumDeclaration.setPrivate(false);
+    enumDeclaration.setProtected(false);
+    enumDeclaration.setPublic(false);
+    enumDeclaration.setStatic(false);
   }
 
   private static void checkConstructor(ConstructorDeclaration constructor) {
